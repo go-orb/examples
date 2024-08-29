@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package user_new;
+
+option go_package = "./user_new;user_new";
+
+message Request { 
+  string name = 1;
+}
+
+message Resp {
+  string name = 1;
+  string uuid = 2;
+}
