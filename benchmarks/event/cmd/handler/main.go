@@ -8,11 +8,8 @@ import (
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
-	_ "github.com/go-orb/plugins/codecs/jsonpb"
 	_ "github.com/go-orb/plugins/codecs/proto"
-	_ "github.com/go-orb/plugins/codecs/yaml"
 	_ "github.com/go-orb/plugins/config/source/cli/urfave"
-	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
 )
@@ -27,31 +24,18 @@ func runner(
 
 	ctx := context.Background()
 
-	inChan, cancelFunc, err := event.HandleRequest[echo.Req, echo.Resp](ctx, eventWire, "echo.echo")
+	echoHandler := func(ctx context.Context, req *echo.Req) (*echo.Resp, error) {
+		return &echo.Resp{Payload: req.GetPayload()}, nil
+	}
+
+	cancelFunc, err := event.HandleRequest(ctx, eventWire, "echo.echo", echoHandler)
 	if err != nil {
 		os.Exit(1)
 	}
 	defer cancelFunc()
 
-LOOP:
-	for {
-		select {
-		case <-done:
-			break LOOP
-		case <-ctx.Done():
-			break LOOP
-		case req := <-inChan:
-			if req.Err != nil {
-				logger.Error("while handling a request", "err", req.Err)
-				continue
-			}
-
-			reply := &echo.Resp{Payload: req.Data.GetPayload()}
-			if err := req.Reply(reply, nil); err != nil {
-				logger.Error("while sending a reply", "err", err)
-			}
-		}
-	}
+	// Blocks until sigterm/sigkill.
+	<-done
 
 	return nil
 }
