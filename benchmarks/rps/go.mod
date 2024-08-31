@@ -1,6 +1,8 @@
 module github.com/go-orb/examples/benchmarks/rps
 
-go 1.21
+go 1.23
+
+toolchain go1.23.0
 
 require (
 	github.com/go-orb/go-orb v0.0.0-20240810234651-a01190e49d61
