@@ -5,14 +5,14 @@ go 1.23
 toolchain go1.23.0
 
 require (
-	github.com/go-orb/go-orb v0.0.0-20240829233908-425ee5e7273c
-	github.com/go-orb/plugins/codecs/jsonpb v0.0.0-20240830050506-2f41aa643dae
-	github.com/go-orb/plugins/codecs/proto v0.0.0-20240830050506-2f41aa643dae
-	github.com/go-orb/plugins/codecs/yaml v0.0.0-20240830050506-2f41aa643dae
-	github.com/go-orb/plugins/config/source/cli/urfave v0.0.0-20240830050506-2f41aa643dae
-	github.com/go-orb/plugins/config/source/file v0.0.0-20240830050506-2f41aa643dae
-	github.com/go-orb/plugins/event/natsjs v0.0.0-20240830050506-2f41aa643dae
-	github.com/go-orb/plugins/log/slog v0.0.0-20240830050506-2f41aa643dae
+	github.com/go-orb/go-orb v0.0.0-20240831182006-95fb90a9afe7
+	github.com/go-orb/plugins/codecs/jsonpb v0.0.0-20240902051655-0791c4c590b6
+	github.com/go-orb/plugins/codecs/proto v0.0.0-20240902051655-0791c4c590b6
+	github.com/go-orb/plugins/codecs/yaml v0.0.0-20240902051655-0791c4c590b6
+	github.com/go-orb/plugins/config/source/cli/urfave v0.0.0-20240902051655-0791c4c590b6
+	github.com/go-orb/plugins/config/source/file v0.0.0-20240902051655-0791c4c590b6
+	github.com/go-orb/plugins/event/natsjs v0.0.0-20240902051655-0791c4c590b6
+	github.com/go-orb/plugins/log/slog v0.0.0-20240902051655-0791c4c590b6
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
 	google.golang.org/protobuf v1.34.2
