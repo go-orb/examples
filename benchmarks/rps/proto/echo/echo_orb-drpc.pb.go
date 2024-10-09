@@ -2,7 +2,7 @@
 //
 // version:
 // - protoc-gen-go-orb        v0.0.1
-// - protoc                   v5.27.2
+// - protoc                   v5.28.0
 //
 // source: echo/echo.proto
 
@@ -67,10 +67,6 @@ func (DRPCEchoDescription) Method(n int) (string, drpc.Encoding, drpc.Receiver, 
 	default:
 		return "", nil, nil, nil, false
 	}
-}
-
-func DRPCRegisterEcho(mux drpc.Mux, impl DRPCEchoServer) error {
-	return mux.Register(impl, DRPCEchoDescription{})
 }
 
 type DRPCEcho_EchoStream interface {

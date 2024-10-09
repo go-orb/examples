@@ -6,16 +6,10 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-orb/go-orb v0.0.0-20240831182006-95fb90a9afe7 h1:9ZCjLkvUlwDSwIhkVRij0nLuP38BMJAJCv4cX1TP3Mg=
 github.com/go-orb/go-orb v0.0.0-20240831182006-95fb90a9afe7/go.mod h1:DdL+EYRtGU8OMU4H7NSQvRxRVzL+GBliOVWC0QHKuy0=
-github.com/go-orb/plugins/codecs/jsonpb v0.0.0-20240902051655-0791c4c590b6 h1:iMLkFAX1xW3cCxnA7ZGya3UgVTkwqJYEtxIUpyyI9UU=
-github.com/go-orb/plugins/codecs/jsonpb v0.0.0-20240902051655-0791c4c590b6/go.mod h1:hmkM0RffqdxTBQIa4o3qWkS+9p13k/WN4YW0U/2nJGo=
 github.com/go-orb/plugins/codecs/proto v0.0.0-20240902051655-0791c4c590b6 h1:hzp1coOeU1of/P8pjpeAjz16dU4eCCGoJwOpf85KoP4=
 github.com/go-orb/plugins/codecs/proto v0.0.0-20240902051655-0791c4c590b6/go.mod h1:vVqejl5/Ma151My8nqvnePeoCS0Dpgqvm9IhH+2S+ZI=
-github.com/go-orb/plugins/codecs/yaml v0.0.0-20240902051655-0791c4c590b6 h1:mAB6PgX2RB6+mqS+s07lJoDzH4BPwZ5yVhHDWFG3tEk=
-github.com/go-orb/plugins/codecs/yaml v0.0.0-20240902051655-0791c4c590b6/go.mod h1:wrz0vdCvDF9DliXxAkb/dR62o2vXkuIYO/lB0sV9iB8=
 github.com/go-orb/plugins/config/source/cli/urfave v0.0.0-20240902051655-0791c4c590b6 h1:c430Tu5rd3okGwU0ZmtPCovbRsUuX4ADZX9xTkh3REo=
 github.com/go-orb/plugins/config/source/cli/urfave v0.0.0-20240902051655-0791c4c590b6/go.mod h1:W9W0ic6YRtZ+7rq0bblgqcjipYr0m+dxK5Ld+UIsGv0=
-github.com/go-orb/plugins/config/source/file v0.0.0-20240902051655-0791c4c590b6 h1:QS1yodW4jZeJyh5IU3TzX/YD9ngS4fR5VEncojh9ZGA=
-github.com/go-orb/plugins/config/source/file v0.0.0-20240902051655-0791c4c590b6/go.mod h1:CYebsFDjuM7GpEvBNkjfhPjNT7YkMg+ucMsY4tFhl4E=
 github.com/go-orb/plugins/event/natsjs v0.0.0-20240902051655-0791c4c590b6 h1:i+jT/AXntfP8i148sTxO8GnCwX4GG7URM7BI1t4Atn4=
 github.com/go-orb/plugins/event/natsjs v0.0.0-20240902051655-0791c4c590b6/go.mod h1:trgZDI86G8Lb8KW4cdCqbEhrKenQ9jFpdbxvnMWTvx4=
 github.com/go-orb/plugins/log/slog v0.0.0-20240902051655-0791c4c590b6 h1:PJHFhvwbSFUdXQGkGRoZDOSOK440bcdjp1ydN+AW0SA=
@@ -24,8 +18,6 @@ github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5a
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/subcommands v1.2.0/go.mod h1:ZjhPrFU+Olkh9WazFPsl27BQ4UPiG37m3yTrtFlrHVk=
-github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
-github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/wire v0.6.0 h1:HBkoIh4BdSxoyo9PveV8giw7ZsaBOvzWKfcg/6MrVwI=
 github.com/google/wire v0.6.0/go.mod h1:F4QhpQ9EDIdJ1Mbop/NZBRB+5yrR6qg3BnctaoUk6NA=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
@@ -35,10 +27,6 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/klauspost/compress v1.17.9 h1:6KIumPrER1LHsvBVuDa0r5xaG0Es51mhhB9BQB2qeMA=
 github.com/klauspost/compress v1.17.9/go.mod h1:Di0epgTjJY877eYKx5yC51cX2A2Vl2ibi7bDH9ttBbw=
-github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
-github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
-github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
-github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
 github.com/nats-io/nats.go v1.37.0 h1:07rauXbVnnJvv1gfIyghFEo6lUcYRY0WXc3x7x0vUxE=
 github.com/nats-io/nats.go v1.37.0/go.mod h1:Ubdu4Nh9exXdSz0RVWRFBbRfrbSxOYd26oF0wkWclB8=
 github.com/nats-io/nkeys v0.4.7 h1:RwNJbbIdYCoClSDNY7QVKZlyb/wfT6ugvFCiKy6vDvI=
@@ -48,8 +36,6 @@ github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OS
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
-github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
@@ -118,8 +104,5 @@ golang.org/x/tools v0.17.0/go.mod h1:xsh6VxdV005rRVaS6SSAf9oiAqljS7UZUacMZ8Bnsps
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 google.golang.org/protobuf v1.34.2 h1:6xV6lTsCfpGD21XK49h7MhtcApnLqkfYgPcdHftf6hg=
 google.golang.org/protobuf v1.34.2/go.mod h1:qYOHts0dSfpeUzUFpOMr/WGzszTmLH+DiWniOlNbLDw=
-gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
-gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
-gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=

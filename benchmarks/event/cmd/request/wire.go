@@ -106,7 +106,7 @@ func run(
 	panic(wire.Build(
 		provideConfigData,
 		wire.Value([]log.Option{}),
-		log.ProvideLogger,
+		log.Provide,
 		wire.Value([]event.Option{}),
 		event.Provide,
 		provideComponents,

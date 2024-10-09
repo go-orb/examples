@@ -7,18 +7,16 @@
 package main
 
 import (
-	"fmt"
-	"github.com/go-orb/examples/benchmarks/rps_no_hertz/handler/echo"
-	echo2 "github.com/go-orb/examples/benchmarks/rps_no_hertz/proto/echo"
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
+	"github.com/go-orb/plugins/client/tests/handler"
+	"github.com/go-orb/plugins/client/tests/proto"
 	"github.com/go-orb/plugins/server/drpc"
 	"github.com/go-orb/plugins/server/grpc"
 	"github.com/go-orb/plugins/server/http"
-	"github.com/hashicorp/consul/sdk/freeport"
 	"net/url"
 )
 
@@ -44,12 +42,12 @@ func newComponents(serviceName types.ServiceName, serviceVersion types.ServiceVe
 		return nil, err
 	}
 	v := _wireValue
-	logger, err := log.ProvideLogger(serviceName, configData, v...)
+	logger, err := log.Provide(serviceName, configData, v...)
 	if err != nil {
 		return nil, err
 	}
 	v2 := _wireValue2
-	registryType, err := registry.ProvideRegistry(serviceName, serviceVersion, configData, logger, v2...)
+	registryType, err := registry.Provide(serviceName, serviceVersion, configData, logger, v2...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +55,7 @@ func newComponents(serviceName types.ServiceName, serviceVersion types.ServiceVe
 	if err != nil {
 		return nil, err
 	}
-	serverServer, err := server.ProvideServer(serviceName, configData, logger, registryType, v3...)
+	serverServer, err := server.Provide(serviceName, configData, logger, registryType, v3...)
 	if err != nil {
 		return nil, err
 	}
@@ -93,18 +91,21 @@ func provideConfigData(
 }
 
 // provideServerOpts provides options for the go-orb server.
-// TODO(jochumdev): We should simplify server opts.
-func provideServerOpts() ([]server.Option, error) {
+func provideServerOpts() ([]server.ConfigOption, error) {
 
-	ports, err := freeport.Take(8)
-	if err != nil {
-		return nil, err
-	}
+	hInstance := new(handler.EchoHandler)
+	hRegister := proto.RegisterStreamsHandler(hInstance)
 
-	hInstance := new(echo.Handler)
+	opts := []server.ConfigOption{}
+	opts = append(opts, server.WithEntrypointConfig(grpc.NewConfig(grpc.WithName("grpc"), grpc.WithInsecure(), grpc.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("http"), http.WithInsecure(), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("https"), http.WithDisableHTTP2(), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("h2c"), http.WithInsecure(), http.WithAllowH2C(), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("http2"), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("http3"), http.WithHTTP3(), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig(drpc.NewConfig(drpc.WithName("drpc"), drpc.WithHandlers(hRegister))))
 
-	return []server.Option{grpc.WithEntrypoint(grpc.WithName("grpc"), grpc.WithAddress(fmt.Sprintf("127.0.0.1:%d", ports[0])), grpc.WithInsecure(true), grpc.WithRegistration("Streams", echo2.RegisterEchoService(hInstance))), http.WithEntrypoint(http.WithName("http"), http.WithAddress(fmt.Sprintf("127.0.0.1:%d", ports[3])), http.WithInsecure(), http.WithRegistration("Streams", echo2.RegisterEchoService(hInstance))), http.WithEntrypoint(http.WithName("h2c"), http.WithAddress(fmt.Sprintf("127.0.0.1:%d", ports[4])), http.WithInsecure(), http.WithAllowH2C(), http.WithRegistration("Streams", echo2.RegisterEchoService(hInstance))), http.WithEntrypoint(http.WithName("http3"), http.WithAddress(fmt.Sprintf("127.0.0.1:%d", ports[5])), http.WithHTTP3(), http.WithRegistration("Streams", echo2.RegisterEchoService(hInstance))), http.WithEntrypoint(http.WithName("https"), http.WithAddress(fmt.Sprintf("127.0.0.1:%d", ports[6])), http.WithRegistration("Streams", echo2.RegisterEchoService(hInstance))), drpc.WithEntrypoint(drpc.WithName("dprc"), drpc.WithAddress(fmt.Sprintf("127.0.0.1:%d", ports[7])), drpc.WithRegistration("Streams", echo2.RegisterEchoService(hInstance))),
-	}, nil
+	return opts, nil
 }
 
 // provideComponents creates a slice of components out of the arguments.

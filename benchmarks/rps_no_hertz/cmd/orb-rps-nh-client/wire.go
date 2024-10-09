@@ -112,11 +112,11 @@ func run(
 	panic(wire.Build(
 		provideConfigData,
 		wire.Value([]log.Option{}),
-		log.ProvideLogger,
+		log.Provide,
 		wire.Value([]registry.Option{}),
-		registry.ProvideRegistry,
+		registry.Provide,
 		wire.Value([]client.Option{}),
-		client.ProvideClient,
+		client.Provide,
 		provideComponents,
 		wireRun,
 	))

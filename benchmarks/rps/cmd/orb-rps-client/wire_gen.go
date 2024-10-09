@@ -22,14 +22,14 @@ import (
 import (
 	_ "github.com/go-orb/plugins/client/middleware/log"
 	_ "github.com/go-orb/plugins/client/orb"
-	_ "github.com/go-orb/plugins/client/orb_transport/drpc"
-	_ "github.com/go-orb/plugins/client/orb_transport/grpc"
-	_ "github.com/go-orb/plugins/client/orb_transport/h2c"
-	_ "github.com/go-orb/plugins/client/orb_transport/hertzh2c"
-	_ "github.com/go-orb/plugins/client/orb_transport/hertzhttp"
-	_ "github.com/go-orb/plugins/client/orb_transport/http"
-	_ "github.com/go-orb/plugins/client/orb_transport/http3"
-	_ "github.com/go-orb/plugins/client/orb_transport/https"
+	_ "github.com/go-orb/plugins/client/orb/transport/drpc"
+	_ "github.com/go-orb/plugins/client/orb/transport/grpc"
+	_ "github.com/go-orb/plugins/client/orb/transport/h2c"
+	_ "github.com/go-orb/plugins/client/orb/transport/hertzh2c"
+	_ "github.com/go-orb/plugins/client/orb/transport/hertzhttp"
+	_ "github.com/go-orb/plugins/client/orb/transport/http"
+	_ "github.com/go-orb/plugins/client/orb/transport/http3"
+	_ "github.com/go-orb/plugins/client/orb/transport/https"
 	_ "github.com/go-orb/plugins/codecs/jsonpb"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/codecs/yaml"
@@ -49,17 +49,17 @@ func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb 
 		return "", err
 	}
 	v := _wireValue
-	logger, err := log.ProvideLogger(serviceName, configData, v...)
+	logger, err := log.Provide(serviceName, configData, v...)
 	if err != nil {
 		return "", err
 	}
 	v2 := _wireValue2
-	registryType, err := registry.ProvideRegistry(serviceName, serviceVersion, configData, logger, v2...)
+	registryType, err := registry.Provide(serviceName, serviceVersion, configData, logger, v2...)
 	if err != nil {
 		return "", err
 	}
 	v3 := _wireValue3
-	clientType, err := client.ProvideClient(serviceName, configData, logger, registryType, v3...)
+	clientType, err := client.Provide(serviceName, configData, logger, registryType, v3...)
 	if err != nil {
 		return "", err
 	}

@@ -19,11 +19,8 @@ import (
 )
 
 import (
-	_ "github.com/go-orb/plugins/codecs/jsonpb"
 	_ "github.com/go-orb/plugins/codecs/proto"
-	_ "github.com/go-orb/plugins/codecs/yaml"
 	_ "github.com/go-orb/plugins/config/source/cli/urfave"
-	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
 )
@@ -37,7 +34,7 @@ func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb 
 		return "", err
 	}
 	v := _wireValue
-	logger, err := log.ProvideLogger(serviceName, configData, v...)
+	logger, err := log.Provide(serviceName, configData, v...)
 	if err != nil {
 		return "", err
 	}

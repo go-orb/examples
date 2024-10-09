@@ -7,15 +7,15 @@ toolchain go1.23.0
 require (
 	github.com/go-orb/go-orb v0.0.0-20240902034447-508ce5c54a46
 	github.com/go-orb/plugins/client/middleware/log v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb_transport/drpc v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb_transport/h2c v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb_transport/hertzh2c v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb_transport/hertzhttp v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb_transport/http v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb_transport/http3 v0.0.0-20240902051655-0791c4c590b6
-	github.com/go-orb/plugins/client/orb_transport/https v0.0.0-20240902051655-0791c4c590b6
+	github.com/go-orb/plugins/client/orb v0.0.0-20240925070424-371b8463d2d6
+	github.com/go-orb/plugins/client/orb/transport/drpc v0.0.0-20240925074005-17c0b37c3d6b
+	github.com/go-orb/plugins/client/orb/transport/grpc v0.0.0-20240925074005-17c0b37c3d6b
+	github.com/go-orb/plugins/client/orb/transport/h2c v0.0.0-20240925074005-17c0b37c3d6b
+	github.com/go-orb/plugins/client/orb/transport/hertzh2c v0.0.0-20240925074005-17c0b37c3d6b
+	github.com/go-orb/plugins/client/orb/transport/hertzhttp v0.0.0-20240925074005-17c0b37c3d6b
+	github.com/go-orb/plugins/client/orb/transport/http v0.0.0-20240925074005-17c0b37c3d6b
+	github.com/go-orb/plugins/client/orb/transport/http3 v0.0.0-20240925074005-17c0b37c3d6b
+	github.com/go-orb/plugins/client/orb/transport/https v0.0.0-20240925074005-17c0b37c3d6b
 	github.com/go-orb/plugins/codecs/jsonpb v0.0.0-20240902051655-0791c4c590b6
 	github.com/go-orb/plugins/codecs/proto v0.0.0-20240902051655-0791c4c590b6
 	github.com/go-orb/plugins/codecs/yaml v0.0.0-20240902051655-0791c4c590b6
@@ -53,8 +53,8 @@ require (
 	github.com/fatih/color v1.17.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-chi/chi/v5 v5.1.0 // indirect
-	github.com/go-orb/plugins/client/orb_transport/basehertz v0.0.0-20240902051655-0791c4c590b6 // indirect
-	github.com/go-orb/plugins/client/orb_transport/basehttp v0.0.0-20240902051655-0791c4c590b6 // indirect
+	github.com/go-orb/plugins/client/orb/transport/basehertz v0.0.0-20240925070424-371b8463d2d6 // indirect
+	github.com/go-orb/plugins/client/orb/transport/basehttp v0.0.0-20240925070424-371b8463d2d6 // indirect
 	github.com/go-orb/plugins/registry/regutil v0.0.0-20240902051655-0791c4c590b6 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/pprof v0.0.0-20240903155634-a8630aee4ab9 // indirect

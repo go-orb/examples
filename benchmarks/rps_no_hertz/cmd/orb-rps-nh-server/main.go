@@ -30,7 +30,7 @@ func main() {
 
 	components, err := newComponents(serviceName, serviceVersion)
 	if err != nil {
-		log.Error("while creating components", err)
+		log.Error("while creating components", "err", err)
 		os.Exit(1)
 	}
 

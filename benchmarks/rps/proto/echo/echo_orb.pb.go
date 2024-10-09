@@ -2,7 +2,7 @@
 //
 // version:
 // - protoc-gen-go-orb        v0.0.1
-// - protoc                   v5.27.2
+// - protoc                   v5.28.0
 //
 // Proto source: echo/echo.proto
 
@@ -11,6 +11,7 @@ package echo
 import (
 	"context"
 
+	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/server"
 
@@ -21,47 +22,64 @@ import (
 	mhttp "github.com/go-orb/plugins/server/http"
 )
 
+// HandlerEcho is the name of a service, it's here to static type/reference.
+const HandlerEcho = "echo.Echo"
+
+// EchoClient is the client for echo.Echo
+type EchoClient struct {
+	client client.Client
+}
+
+// NewEchoClient creates a new client for echo.Echo
+func NewEchoClient(client client.Client) *EchoClient {
+	return &EchoClient{client: client}
+}
+
+// Echo calls Echo.
+func (c *EchoClient) Echo(ctx context.Context, service string, req *Req, opts ...client.CallOption) (*Resp, error) {
+	return client.Call[Resp](ctx, c.client, service, "echo.Echo/Echo", req, opts...)
+}
+
+// EchoHandler is the Handler for echo.Echo
 type EchoHandler interface {
 	Echo(ctx context.Context, req *Req) (*Resp, error)
 }
 
+// registerEchoDRPCHandler registers the service to an dRPC server.
 func registerEchoDRPCHandler(srv *mdrpc.Server, handler EchoHandler) error {
 	desc := DRPCEchoDescription{}
 
 	// Register with DRPC.
 	r := srv.Router()
 
-	// Register with the drpcmux.
+	// Register with the server/drpc(.Mux).
 	err := r.Register(handler, desc)
 	if err != nil {
 		return err
 	}
 
 	// Add each endpoint name of this handler to the orb drpc server.
-	for i := 0; i < desc.NumMethods(); i++ {
-		name, _, _, _, _ := desc.Method(i)
-		srv.AddEndpoint(name)
-	}
+	srv.AddEndpoint("/echo.Echo/Echo")
 
 	return nil
 }
 
 // registerEchoHTTPHandler registers the service to an HTTP server.
-func registerEchoHTTPHandler(srv *mhttp.ServerHTTP, handler EchoHandler) {
+func registerEchoHTTPHandler(srv *mhttp.Server, handler EchoHandler) {
 	r := srv.Router()
-	r.Post("/echo.Echo/Echo", mhttp.NewGRPCHandler(srv, handler.Echo))
+	r.Post("/echo.Echo/Echo", mhttp.NewGRPCHandler(srv, handler.Echo, HandlerEcho, "Echo"))
 }
 
 // registerEchoHertzHandler registers the service to an Hertz server.
 func registerEchoHertzHandler(srv *mhertz.Server, handler EchoHandler) {
 	r := srv.Router()
-	r.POST("/echo.Echo/Echo", mhertz.NewGRPCHandler(srv, handler.Echo))
+	r.POST("/echo.Echo/Echo", mhertz.NewGRPCHandler(srv, handler.Echo, HandlerEcho, "Echo"))
 }
 
-// RegisterEchoService will return a registration function that can be
+// RegisterEchoHandler will return a registration function that can be
 // provided to entrypoints as a handler registration.
-func RegisterEchoService(handler EchoHandler) server.RegistrationFunc {
-	return server.RegistrationFunc(func(s any) {
+func RegisterEchoHandler(handler EchoHandler) server.RegistrationFunc {
+	return func(s any) {
 		switch srv := s.(type) {
 
 		case grpc.ServiceRegistrar:
@@ -70,10 +88,10 @@ func RegisterEchoService(handler EchoHandler) server.RegistrationFunc {
 			registerEchoDRPCHandler(srv, handler)
 		case *mhertz.Server:
 			registerEchoHertzHandler(srv, handler)
-		case *mhttp.ServerHTTP:
+		case *mhttp.Server:
 			registerEchoHTTPHandler(srv, handler)
 		default:
 			log.Warn("No provider for this server found", "proto", "echo/echo.proto", "handler", "Echo", "server", s)
 		}
-	})
+	}
 }
