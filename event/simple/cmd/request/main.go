@@ -18,12 +18,12 @@ func runner(
 	sn types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
-	eventWire event.Type,
+	eventHandler event.Handler,
 	done chan os.Signal,
 ) error {
 	req := &user_new.Request{Name: "René"}
 
-	resp, err := event.Request[user_new.Resp](context.Background(), eventWire, "user.new", req)
+	resp, err := event.Request[user_new.Resp](context.Background(), eventHandler, "user.new", req)
 	if err != nil {
 		logger.Error("while requesting", "err", err)
 		os.Exit(1)

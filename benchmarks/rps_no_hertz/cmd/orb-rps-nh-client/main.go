@@ -81,15 +81,10 @@ func connection(
 		// Create a request.
 		req := &echoproto.Req{Payload: msg}
 
+		reqClient := echoproto.NewEchoClient(cli)
+
 		// Run the query.
-		resp, err := client.Call[echoproto.Resp](
-			ctx,
-			cli,
-			serverName,
-			"echo.Echo/Echo",
-			req,
-			opts...,
-		)
+		resp, err := reqClient.Echo(ctx, serverName, req, opts...)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				continue

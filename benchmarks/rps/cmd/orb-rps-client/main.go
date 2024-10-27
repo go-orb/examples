@@ -24,6 +24,7 @@ import (
 	echoproto "github.com/go-orb/examples/benchmarks/rps/proto/echo"
 
 	_ "github.com/go-orb/plugins/client/orb"
+	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/jsonpb"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/codecs/yaml"

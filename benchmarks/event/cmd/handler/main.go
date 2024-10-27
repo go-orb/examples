@@ -8,6 +8,7 @@ import (
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
+	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/event/natsjs"
@@ -18,24 +19,22 @@ func runner(
 	sn types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
-	eventWire event.Type,
+	eventWire event.Handler,
 	done chan os.Signal,
 ) error {
-
-	ctx := context.Background()
 
 	echoHandler := func(ctx context.Context, req *echo.Req) (*echo.Resp, error) {
 		return &echo.Resp{Payload: req.GetPayload()}, nil
 	}
 
-	cancelFunc, err := event.HandleRequest(ctx, eventWire, "echo.echo", echoHandler)
-	if err != nil {
-		os.Exit(1)
-	}
-	defer cancelFunc()
+	ctx, cancel := context.WithCancel(context.Background())
+
+	event.HandleRequest(ctx, eventWire, "echo.echo", echoHandler)
 
 	// Blocks until sigterm/sigkill.
 	<-done
+
+	cancel()
 
 	return nil
 }

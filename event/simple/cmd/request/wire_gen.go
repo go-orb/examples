@@ -39,15 +39,15 @@ func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb 
 		return "", err
 	}
 	v2 := _wireValue2
-	eventType, err := event.Provide(serviceName, configData, logger, v2...)
+	handler, err := event.Provide(serviceName, configData, logger, v2...)
 	if err != nil {
 		return "", err
 	}
-	v3, err := provideComponents(logger, eventType)
+	v3, err := provideComponents(logger, handler)
 	if err != nil {
 		return "", err
 	}
-	mainWireRunResult, err := wireRun(serviceName, v3, configData, logger, eventType, cb)
+	mainWireRunResult, err := wireRun(serviceName, v3, configData, logger, handler, cb)
 	if err != nil {
 		return "", err
 	}
@@ -80,7 +80,7 @@ func provideConfigData(
 
 // provideComponents creates a slice of components out of the arguments.
 func provideComponents(
-	logger log.Logger, event2 event.Type,
+	logger log.Logger, event2 event.Handler,
 
 ) ([]types.Component, error) {
 	components := []types.Component{}
@@ -95,7 +95,7 @@ type wireRunResult string
 type wireRunCallback func(
 	serviceName types.ServiceName,
 	configs types.ConfigData,
-	logger log.Logger, event2 event.Type,
+	logger log.Logger, event2 event.Handler,
 
 	done chan os.Signal,
 ) error
@@ -104,7 +104,7 @@ func wireRun(
 	serviceName types.ServiceName,
 	components []types.Component,
 	configs types.ConfigData,
-	logger log.Logger, event2 event.Type,
+	logger log.Logger, event2 event.Handler,
 
 	cb wireRunCallback,
 ) (wireRunResult, error) {

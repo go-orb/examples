@@ -26,7 +26,7 @@ GLOBAL OPTIONS:
    --log_level value                                          Log level (FATAL, ERROR, NOTICE, WARN, INFO, DEBUG, TRACE) (default: "INFO") [$LOG_LEVEL]
    --registry_domain value                                    Registry domain. (default: "micro")
    --transport value                                          Transport to use (grpc, hertzhttp, http, uvm.) (default: "grpc") [$TRANSPORT]
-   --content_type value                                       Content-Type (application/x-protobuf, application/json) (default: "application/x-protobuf") [$CONTENT_TYPE]
+   --content_type value                                       Content-Type (application/protobuf, application/json) (default: "application/protobuf") [$CONTENT_TYPE]
    --duration value                                           Duration in seconds (default: 15) [$DURATION]
    --timeout value                                            Timeout in seconds (default: 8) [$TIMEOUT]
    --threads value                                            Number of threads to use = runtime.GOMAXPROCS() (default: 24) [$THREADS]

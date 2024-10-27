@@ -7,13 +7,13 @@
 package main
 
 import (
+	"github.com/go-orb/examples/benchmarks/rps_no_hertz/handler/echo"
+	echo2 "github.com/go-orb/examples/benchmarks/rps_no_hertz/proto/echo"
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
-	"github.com/go-orb/plugins/client/tests/handler"
-	"github.com/go-orb/plugins/client/tests/proto"
 	"github.com/go-orb/plugins/server/drpc"
 	"github.com/go-orb/plugins/server/grpc"
 	"github.com/go-orb/plugins/server/hertz"
@@ -94,8 +94,8 @@ func provideConfigData(
 // provideServerOpts provides options for the go-orb server.
 func provideServerOpts() ([]server.ConfigOption, error) {
 
-	hInstance := new(handler.EchoHandler)
-	hRegister := proto.RegisterStreamsHandler(hInstance)
+	hInstance := new(echo.Handler)
+	hRegister := echo2.RegisterEchoHandler(hInstance)
 
 	opts := []server.ConfigOption{}
 	opts = append(opts, server.WithEntrypointConfig(hertz.NewConfig(hertz.WithName("hertzhttp"), hertz.WithDisableHTTP2(), hertz.WithInsecure(), hertz.WithHandlers(hRegister))))

@@ -37,7 +37,7 @@ func provideConfigData(
 // provideComponents creates a slice of components out of the arguments.
 func provideComponents(
 	logger log.Logger,
-	event event.Type,
+	event event.Handler,
 ) ([]types.Component, error) {
 	components := []types.Component{}
 	components = append(components, logger)
@@ -52,7 +52,7 @@ type wireRunCallback func(
 	serviceName types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
-	event event.Type,
+	event event.Handler,
 	done chan os.Signal,
 ) error
 
@@ -61,7 +61,7 @@ func wireRun(
 	components []types.Component,
 	configs types.ConfigData,
 	logger log.Logger,
-	event event.Type,
+	event event.Handler,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	//

@@ -13,8 +13,8 @@ import (
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
 
-	"github.com/go-orb/plugins/client/tests/handler"
-	"github.com/go-orb/plugins/client/tests/proto"
+	"github.com/go-orb/examples/benchmarks/rps_no_hertz/handler/echo"
+	proto "github.com/go-orb/examples/benchmarks/rps_no_hertz/proto/echo"
 	"github.com/go-orb/plugins/server/drpc"
 	mgrpc "github.com/go-orb/plugins/server/grpc"
 	mhttp "github.com/go-orb/plugins/server/http"
@@ -42,8 +42,8 @@ func provideConfigData(
 // provideServerOpts provides options for the go-orb server.
 func provideServerOpts() ([]server.ConfigOption, error) {
 
-	hInstance := new(handler.EchoHandler)
-	hRegister := proto.RegisterStreamsHandler(hInstance)
+	hInstance := new(echo.Handler)
+	hRegister := proto.RegisterEchoHandler(hInstance)
 
 	opts := []server.ConfigOption{}
 	opts = append(opts, server.WithEntrypointConfig(mgrpc.NewConfig(

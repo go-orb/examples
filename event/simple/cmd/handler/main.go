@@ -19,7 +19,7 @@ func runner(
 	sn types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
-	eventWire event.Type,
+	eventWire event.Handler,
 	done chan os.Signal,
 ) error {
 
@@ -27,16 +27,14 @@ func runner(
 		return &user_new.Resp{Name: req.GetName(), Uuid: uuid.New().String()}, nil
 	}
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 
-	cancelFunc, err := event.HandleRequest(ctx, eventWire, "user.new", userNewHandler)
-	if err != nil {
-		os.Exit(1)
-	}
-	defer cancelFunc()
+	event.HandleRequest(ctx, eventWire, "user.new", userNewHandler)
 
 	// Blocks until sigterm/sigkill.
 	<-done
+
+	cancel()
 
 	return nil
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
+	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/event/natsjs"
@@ -30,9 +31,9 @@ type stats struct {
 func connection(
 	ctx context.Context,
 	wg *sync.WaitGroup,
-	eventWire event.Type,
+	eventHandler event.Handler,
 	logger log.Logger,
-	msg []byte,
+	req *echo.Req,
 	connectionNum int,
 	statsChan chan stats,
 ) {
@@ -53,11 +54,8 @@ func connection(
 		default:
 		}
 
-		// Create a request.
-		req := &echo.Req{Payload: msg}
-
 		// Run the query.
-		resp, err := event.Request[echo.Resp](context.Background(), eventWire, "echo.echo", req)
+		resp, err := event.Request[echo.Resp](context.Background(), eventHandler, "echo.echo", req)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				continue
@@ -90,7 +88,7 @@ func bench(
 	sn types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
-	eventWire event.Type,
+	eventHandler event.Handler,
 	done chan os.Signal,
 ) error {
 	cfg := &clientConfig{
@@ -149,7 +147,10 @@ func bench(
 	for i := 0; i < cfg.Connections; i++ {
 		wg.Add(1)
 
-		go connection(wCtx, &wg, eventWire, logger, msg, i, nullChan)
+		// Create a request.
+		req := &echo.Req{Payload: msg}
+
+		go connection(wCtx, &wg, eventHandler, logger, req, i, nullChan)
 	}
 
 	select {
@@ -180,7 +181,10 @@ func bench(
 	for i := 0; i < cfg.Connections; i++ {
 		wg.Add(1)
 
-		go connection(ctx, &wg, eventWire, logger, msg, i, statsChan)
+		// Create a request.
+		req := &echo.Req{Payload: msg}
+
+		go connection(ctx, &wg, eventHandler, logger, req, i, statsChan)
 	}
 
 	// Blocks until timer/signal happened
