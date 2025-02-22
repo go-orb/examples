@@ -49,11 +49,8 @@ func provideComponents(
 type wireRunResult string
 
 type wireRunCallback func(
-	serviceName types.ServiceName,
-	configs types.ConfigData,
 	logger log.Logger,
 	event event.Handler,
-	done chan os.Signal,
 ) error
 
 func wireRun(
@@ -79,7 +76,7 @@ func wireRun(
 
 	//
 	// Actual code
-	runErr := cb(serviceName, configs, logger, event, done)
+	runErr := cb(logger, event)
 
 	//
 	// Orb shutdown.

@@ -80,9 +80,9 @@ func init() {
 }
 
 type clientConfig struct {
-	Connections int `json:"connections"    yaml:"connections"`
-	Duration    int `json:"duration"       yaml:"duration"`
-	Timeout     int `json:"timeout"        yaml:"timeout"`
-	Threads     int `json:"threads"        yaml:"threads"`
-	PackageSize int `json:"packageSize"    yaml:"packageSize"`
+	Connections int `json:"connections" yaml:"connections"`
+	Duration    int `json:"duration"    yaml:"duration"`
+	Timeout     int `json:"timeout"     yaml:"timeout"`
+	Threads     int `json:"threads"     yaml:"threads"`
+	PackageSize int `json:"packageSize" yaml:"packageSize"`
 }

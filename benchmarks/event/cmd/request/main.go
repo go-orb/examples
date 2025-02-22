@@ -1,3 +1,4 @@
+// Package main contains a client which benchmarks requests-per-second (rps) for a go-orb/server.
 package main
 
 import (
@@ -43,7 +44,10 @@ func connection(
 	)
 
 	eventHandler = eventHandler.Clone()
-	eventHandler.Start()
+	if err := eventHandler.Start(); err != nil {
+		logger.Error("Failed to start", "err", err)
+		return
+	}
 
 	for {
 		select {
@@ -53,7 +57,9 @@ func connection(
 
 			statsChan <- stats{Ok: reqsOk, Error: reqsError}
 
-			eventHandler.Stop(context.Background())
+			if err := eventHandler.Stop(context.Background()); err != nil {
+				logger.Error("Failed to stop", "err", err)
+			}
 
 			return
 		default:
@@ -162,6 +168,7 @@ func bench(
 		wCancel()
 		timer.Stop()
 	case <-quit:
+		wCancel()
 		timer.Stop()
 		os.Exit(1)
 	}
@@ -199,6 +206,7 @@ func bench(
 		wg.Wait()
 	case <-quit:
 		timer.Stop()
+		cancel()
 		os.Exit(0)
 	}
 

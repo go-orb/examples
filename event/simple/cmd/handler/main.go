@@ -1,3 +1,4 @@
+// Package main contains a simple handler/server example for a event run.
 package main
 
 import (
@@ -17,14 +18,10 @@ import (
 )
 
 func runner(
-	sn types.ServiceName,
-	configs types.ConfigData,
-	logger log.Logger,
 	eventWire event.Handler,
 	done chan os.Signal,
 ) error {
-
-	userNewHandler := func(ctx context.Context, req *user_new.Request) (*user_new.Resp, error) {
+	userNewHandler := func(_ context.Context, req *user_new.Request) (*user_new.Resp, error) {
 		return &user_new.Resp{Name: req.GetName(), Uuid: uuid.New().String()}, nil
 	}
 

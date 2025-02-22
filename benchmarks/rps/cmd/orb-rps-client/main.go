@@ -239,6 +239,7 @@ func bench(
 		wCancel()
 		timer.Stop()
 	case <-quit:
+		wCancel()
 		timer.Stop()
 		os.Exit(1)
 	}
@@ -268,6 +269,7 @@ func bench(
 	// Blocks until timer/signal happened
 	select {
 	case <-done:
+		wCancel()
 		timer.Stop()
 		// stops requesting
 		cancel()
@@ -275,7 +277,9 @@ func bench(
 		// Wait for all goroutines to exit properly.
 		wg.Wait()
 	case <-quit:
+		wCancel()
 		timer.Stop()
+		cancel()
 		os.Exit(0)
 	}
 
@@ -301,6 +305,9 @@ func bench(
 		"reqsOk", mStats.Ok,
 		"reqsError", mStats.Error,
 	)
+
+	wCancel()
+	cancel()
 
 	return nil
 }

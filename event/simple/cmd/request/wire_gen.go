@@ -94,11 +94,8 @@ func provideComponents(
 type wireRunResult string
 
 type wireRunCallback func(
-	serviceName types.ServiceName,
-	configs types.ConfigData,
 	logger log.Logger, event2 event.Handler,
 
-	done chan os.Signal,
 ) error
 
 func wireRun(
@@ -121,7 +118,7 @@ func wireRun(
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
-	runErr := cb(serviceName, configs, logger, event2, done)
+	runErr := cb(logger, event2)
 
 	ctx := context.Background()
 

@@ -50,7 +50,7 @@ func (m *GoOrb) runAll(ctx context.Context, root *dagger.Directory, worker func(
 	var wg sync.WaitGroup
 
 	// Start workers
-	for i := 0; i < runtime.NumCPU()/2; i++ {
+	for i := 0; i < runtime.NumCPU(); i++ {
 		wg.Add(1)
 		go worker(ctx, &wg, input, res, root)
 	}
@@ -72,14 +72,14 @@ func (m *GoOrb) runAll(ctx context.Context, root *dagger.Directory, worker func(
 	for r := range res {
 		if r.Err != nil {
 			err = multierror.Append(err, r.Err)
+
+			if len(r.Logs) > 0 {
+				result.Logs = append(result.Logs, "## "+r.Module+"\n"+r.Logs+"\n\n")
+			}
 		}
 
 		if r.Source != nil {
 			result.Source = result.Source.WithDirectory(r.Module, r.Source)
-		}
-
-		if len(r.Logs) > 0 {
-			result.Logs = append(result.Logs, "## "+r.Module+"\n"+r.Logs+"\n\n")
 		}
 	}
 
@@ -126,7 +126,7 @@ func (m *GoOrb) Lint(
 			default:
 			}
 
-			out, err := dag.Container().From("golangci/golangci-lint").
+			out, err := dag.Container().From("golangci/golangci-lint:v1.64.5").
 				WithMountedCache("/go/pkg/mod",
 					dag.CacheVolume("go-mod"),
 					dagger.ContainerWithMountedCacheOpts{
@@ -145,7 +145,7 @@ func (m *GoOrb) Lint(
 				WithDirectory("/work/src", root.Directory(dir)).
 				WithWorkdir("/work/src").
 				WithMountedFile("/work/config", golangciConfig).
-				WithExec([]string{"golangci-lint", "run", "--config", "/work/config"}).
+				WithExec([]string{"golangci-lint", "run", "--config", "/work/config", "--timeout=10m"}).
 				Stdout(ctx)
 
 			res <- &WorkerResult{Module: dir, Logs: out, Err: err}
@@ -212,7 +212,7 @@ func (m *GoOrb) Test(ctx context.Context, root *dagger.Directory) (*AllResult, e
 	return m.runAll(ctx, root, testWorker)
 }
 
-// Runs `go mod tidy -go=1.23` in all modules starting with `root`
+// Runs `go mod tidy -go=1.23.6` in all modules starting with `root`
 func (m *GoOrb) Tidy(ctx context.Context, root *dagger.Directory) (*AllResult, error) {
 	tidyWorker := func(ctx context.Context, wg *sync.WaitGroup, input <-chan string, res chan<- *WorkerResult, root *dagger.Directory) {
 		defer wg.Done()
@@ -224,7 +224,7 @@ func (m *GoOrb) Tidy(ctx context.Context, root *dagger.Directory) (*AllResult, e
 			}
 
 			c := m.goContainer(root, dir).
-				WithExec([]string{"go", "mod", "tidy", "-go=1.23"})
+				WithExec([]string{"go", "mod", "tidy", "-go=1.23.6"})
 			stdout, err := c.Stdout(ctx)
 			if err != nil {
 				res <- &WorkerResult{Module: dir, Source: c.Directory("/work/src"), Err: err}
@@ -256,9 +256,12 @@ func (m *GoOrb) Update(ctx context.Context, root *dagger.Directory) (*AllResult,
 			}
 
 			c := m.goContainer(root, dir).
+				WithEnvVariable("GOPROXY", "direct").
+				WithEnvVariable("GOSUMDB", "off").
 				WithExec([]string{"go", "get", "-u", "-t", "./..."}).
 				WithExec([]string{"go", "get", "-u", "github.com/go-orb/go-orb@main"}).
-				WithExec([]string{"bash", "-c", "for m in $(grep github.com/go-orb/plugins go.mod | egrep -v \"^module\" | awk '{ print $1 }'); do go get -u \"${m}@main\"; done"})
+				WithExec([]string{"bash", "-c", "for m in $(grep github.com/go-orb/plugins go.mod | grep -E -v \"^module\" | awk '{ print $1 }'); do go get -u \"${m}@main\"; done"}).
+				WithExec([]string{"go", "mod", "tidy", "-go=1.23.6"})
 
 			stdout, err := c.Stdout(ctx)
 			if err != nil {

@@ -1,3 +1,4 @@
+// Package main contains a handler which acts as server for the request client.
 package main
 
 import (
@@ -16,14 +17,10 @@ import (
 )
 
 func runner(
-	sn types.ServiceName,
-	configs types.ConfigData,
-	logger log.Logger,
 	eventWire event.Handler,
 	done chan os.Signal,
 ) error {
-
-	echoHandler := func(ctx context.Context, req *echo.Req) (*echo.Resp, error) {
+	echoHandler := func(_ context.Context, req *echo.Req) (*echo.Resp, error) {
 		return &echo.Resp{Payload: req.GetPayload()}, nil
 	}
 

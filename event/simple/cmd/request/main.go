@@ -1,3 +1,4 @@
+// Package main contains a simple client example for a event run.
 package main
 
 import (
@@ -16,11 +17,8 @@ import (
 )
 
 func runner(
-	sn types.ServiceName,
-	configs types.ConfigData,
 	logger log.Logger,
 	eventHandler event.Handler,
-	done chan os.Signal,
 ) error {
 	req := &user_new.Request{Name: "René"}
 
