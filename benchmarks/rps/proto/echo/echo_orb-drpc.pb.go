@@ -2,7 +2,7 @@
 //
 // version:
 // - protoc-gen-go-orb        v0.0.1
-// - protoc                   v5.28.0
+// - protoc                   v5.29.2
 //
 // source: echo/echo.proto
 

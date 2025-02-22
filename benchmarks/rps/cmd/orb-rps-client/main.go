@@ -23,16 +23,15 @@ import (
 	// Own imports.
 	echoproto "github.com/go-orb/examples/benchmarks/rps/proto/echo"
 
+	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/client/orb"
 	_ "github.com/go-orb/plugins/codecs/json"
-	_ "github.com/go-orb/plugins/codecs/jsonpb"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/codecs/yaml"
 	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
 	_ "github.com/go-orb/plugins/registry/consul"
-	_ "github.com/go-orb/plugins/registry/mdns"
 
 	_ "github.com/go-orb/plugins/client/middleware/log"
 
@@ -40,8 +39,6 @@ import (
 	_ "github.com/go-orb/plugins/client/orb/transport/drpc"
 	_ "github.com/go-orb/plugins/client/orb/transport/grpc"
 	_ "github.com/go-orb/plugins/client/orb/transport/h2c"
-	_ "github.com/go-orb/plugins/client/orb/transport/hertzh2c"
-	_ "github.com/go-orb/plugins/client/orb/transport/hertzhttp"
 	_ "github.com/go-orb/plugins/client/orb/transport/http"
 	_ "github.com/go-orb/plugins/client/orb/transport/http3"
 	_ "github.com/go-orb/plugins/client/orb/transport/https"

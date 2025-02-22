@@ -13,11 +13,10 @@ import (
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
 
-	"github.com/go-orb/examples/benchmarks/rps_no_hertz/handler/echo"
-	proto "github.com/go-orb/examples/benchmarks/rps_no_hertz/proto/echo"
+	"github.com/go-orb/examples/benchmarks/rps/handler/echo"
+	proto "github.com/go-orb/examples/benchmarks/rps/proto/echo"
 	"github.com/go-orb/plugins/server/drpc"
 	mgrpc "github.com/go-orb/plugins/server/grpc"
-	mhertz "github.com/go-orb/plugins/server/hertz"
 	mhttp "github.com/go-orb/plugins/server/http"
 
 	"github.com/google/wire"
@@ -47,18 +46,6 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 	hRegister := proto.RegisterEchoHandler(hInstance)
 
 	opts := []server.ConfigOption{}
-	opts = append(opts, server.WithEntrypointConfig(mhertz.NewConfig(
-		mhertz.WithName("hertzhttp"),
-		mhertz.WithDisableHTTP2(),
-		mhertz.WithInsecure(),
-		mhertz.WithHandlers(hRegister),
-	)))
-	opts = append(opts, server.WithEntrypointConfig(mhertz.NewConfig(
-		mhertz.WithName("hertzh2c"),
-		mhertz.WithInsecure(),
-		mhertz.WithAllowH2C(),
-		mhertz.WithHandlers(hRegister),
-	)))
 	opts = append(opts, server.WithEntrypointConfig(mgrpc.NewConfig(
 		mgrpc.WithName("grpc"),
 		mgrpc.WithInsecure(),

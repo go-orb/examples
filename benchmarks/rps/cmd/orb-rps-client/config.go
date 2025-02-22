@@ -14,9 +14,9 @@ const (
 	defaultConnections    = 256
 	defaultDuration       = 15
 	defaultTimeout        = 8
-	defaultTransport      = "grpc"
+	defaultTransport      = "drpc"
 	defaultPackageSize    = 1000
-	defaultContentType    = "application/protobuf"
+	defaultContentType    = "application/x-protobuf"
 )
 
 //nolint:gochecknoglobals
@@ -111,7 +111,7 @@ func init2() {
 		"content_type",
 		defaultContentType,
 		cli.ConfigPathSlice([]string{configSection, "contentType"}),
-		cli.Usage("Content-Type (application/protobuf, application/protobuf+json)"),
+		cli.Usage("Content-Type (application/x-protobuf, application/x-protobuf+json)"),
 		cli.EnvVars("CONTENT_TYPE"),
 	))
 	if err != nil && !errors.Is(err, cli.ErrFlagExists) {

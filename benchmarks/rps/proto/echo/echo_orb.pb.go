@@ -2,7 +2,7 @@
 //
 // version:
 // - protoc-gen-go-orb        v0.0.1
-// - protoc                   v5.28.0
+// - protoc                   v5.29.2
 //
 // Proto source: echo/echo.proto
 
@@ -18,7 +18,7 @@ import (
 	grpc "google.golang.org/grpc"
 
 	mdrpc "github.com/go-orb/plugins/server/drpc"
-	mhertz "github.com/go-orb/plugins/server/hertz"
+
 	mhttp "github.com/go-orb/plugins/server/http"
 )
 
@@ -70,12 +70,6 @@ func registerEchoHTTPHandler(srv *mhttp.Server, handler EchoHandler) {
 	r.Post("/echo.Echo/Echo", mhttp.NewGRPCHandler(srv, handler.Echo, HandlerEcho, "Echo"))
 }
 
-// registerEchoHertzHandler registers the service to an Hertz server.
-func registerEchoHertzHandler(srv *mhertz.Server, handler EchoHandler) {
-	r := srv.Router()
-	r.POST("/echo.Echo/Echo", mhertz.NewGRPCHandler(srv, handler.Echo, HandlerEcho, "Echo"))
-}
-
 // RegisterEchoHandler will return a registration function that can be
 // provided to entrypoints as a handler registration.
 func RegisterEchoHandler(handler EchoHandler) server.RegistrationFunc {
@@ -86,8 +80,6 @@ func RegisterEchoHandler(handler EchoHandler) server.RegistrationFunc {
 			registerEchoGRPCHandler(srv, handler)
 		case *mdrpc.Server:
 			registerEchoDRPCHandler(srv, handler)
-		case *mhertz.Server:
-			registerEchoHertzHandler(srv, handler)
 		case *mhttp.Server:
 			registerEchoHTTPHandler(srv, handler)
 		default:

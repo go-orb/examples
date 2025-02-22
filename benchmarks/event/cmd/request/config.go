@@ -14,7 +14,7 @@ const (
 	defaultDuration    = 15
 	defaultTimeout     = 8
 	defaultPackageSize = 1000
-	defaultContentType = "application/protobuf"
+	defaultContentType = "application/x-protobuf"
 )
 
 //nolint:gochecknoglobals
@@ -56,12 +56,7 @@ func init() {
 		panic(err)
 	}
 
-	// function init is to long.....
-	init2()
-}
-
-func init2() {
-	err := cli.Flags.Add(cli.NewFlag(
+	err = cli.Flags.Add(cli.NewFlag(
 		"threads",
 		defaultThreads,
 		cli.ConfigPathSlice([]string{configSection, "threads"}),
@@ -82,24 +77,12 @@ func init2() {
 	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
 		panic(err)
 	}
-
-	err = cli.Flags.Add(cli.NewFlag(
-		"content_type",
-		defaultContentType,
-		cli.ConfigPathSlice([]string{configSection, "contentType"}),
-		cli.Usage("Content-Type (application/protobuf, application/json)"),
-		cli.EnvVars("CONTENT_TYPE"),
-	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
 }
 
 type clientConfig struct {
-	Connections int    `json:"connections"    yaml:"connections"`
-	Duration    int    `json:"duration"       yaml:"duration"`
-	Timeout     int    `json:"timeout"        yaml:"timeout"`
-	Threads     int    `json:"threads"        yaml:"threads"`
-	PackageSize int    `json:"packageSize"    yaml:"packageSize"`
-	ContentType string `json:"contentType"    yaml:"contentType"`
+	Connections int `json:"connections"    yaml:"connections"`
+	Duration    int `json:"duration"       yaml:"duration"`
+	Timeout     int `json:"timeout"        yaml:"timeout"`
+	Threads     int `json:"threads"        yaml:"threads"`
+	PackageSize int `json:"packageSize"    yaml:"packageSize"`
 }

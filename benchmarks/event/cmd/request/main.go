@@ -16,7 +16,7 @@ import (
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
-	_ "github.com/go-orb/plugins/codecs/json"
+	_ "github.com/go-orb/plugins/codecs/goccyjson"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/event/natsjs"
@@ -42,6 +42,9 @@ func connection(
 		reqsError uint64
 	)
 
+	eventHandler = eventHandler.Clone()
+	eventHandler.Start()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -49,6 +52,8 @@ func connection(
 			wg.Done()
 
 			statsChan <- stats{Ok: reqsOk, Error: reqsError}
+
+			eventHandler.Stop(context.Background())
 
 			return
 		default:
@@ -97,7 +102,6 @@ func bench(
 		Timeout:     defaultTimeout,
 		Threads:     defaultThreads,
 		PackageSize: defaultPackageSize,
-		ContentType: defaultContentType,
 	}
 
 	sections := append(types.SplitServiceName(sn), configSection)
@@ -112,7 +116,6 @@ func bench(
 		"timeout", cfg.Timeout,
 		"threads", cfg.Threads,
 		"package_size", cfg.PackageSize,
-		"content_type", cfg.ContentType,
 	)
 
 	runtime.GOMAXPROCS(cfg.Threads)
@@ -144,11 +147,12 @@ func bench(
 
 	nullChan := make(chan stats, cfg.Connections)
 
+	// Create a request.
+	req := &echo.Req{Payload: msg}
+
+	// Run cfg.Connections go routines which request in a loop.
 	for i := 0; i < cfg.Connections; i++ {
 		wg.Add(1)
-
-		// Create a request.
-		req := &echo.Req{Payload: msg}
 
 		go connection(wCtx, &wg, eventHandler, logger, req, i, nullChan)
 	}
@@ -177,12 +181,9 @@ func bench(
 	// Statistics channel
 	statsChan := make(chan stats, cfg.Connections)
 
-	// Run the requests.
+	// Run cfg.Connections go routines which request in a loop.
 	for i := 0; i < cfg.Connections; i++ {
 		wg.Add(1)
-
-		// Create a request.
-		req := &echo.Req{Payload: msg}
 
 		go connection(ctx, &wg, eventHandler, logger, req, i, statsChan)
 	}
@@ -217,7 +218,6 @@ func bench(
 		"timeout", cfg.Timeout,
 		"threads", cfg.Threads,
 		"package_size", cfg.PackageSize,
-		"content_type", cfg.ContentType,
 		"reqsOk", mStats.Ok,
 		"reqsError", mStats.Error,
 	)
