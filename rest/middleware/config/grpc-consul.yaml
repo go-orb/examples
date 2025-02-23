@@ -1,0 +1,33 @@
+orb:
+  examples:
+    rest:
+      middleware:
+        # The "client" service config
+        client:
+          client:
+            preferredTransports: ["grpc"]
+            anyTransport: false
+            middlewares:
+              - name: log
+          logger:
+            format: text
+            level: TRACE
+          registry:
+            plugin: consul
+
+        # The "server" service config
+        server:
+          server:
+            handlers:
+              - echo.Echo
+            entrypoints:
+              - name: grpc
+                plugin: grpc
+                insecure: true
+                reflection: false
+          logger:
+            plugin: lumberjack
+            file: server.log
+            level: TRACE
+          registry:
+            plugin: consul

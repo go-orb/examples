@@ -34,8 +34,6 @@ import (
 	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/registry/consul"
 
-	_ "github.com/go-orb/plugins/client/middleware/log"
-
 	// All transports.
 	_ "github.com/go-orb/plugins/client/orb/transport/drpc"
 	_ "github.com/go-orb/plugins/client/orb/transport/grpc"
