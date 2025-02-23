@@ -19,17 +19,29 @@ jobs:
           verb: call
           args: lint --root=.
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
-  test:
-    name: Unit Tests
+  # test:
+  #   name: Unit Tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - name: Run unit tests
+  #       uses: dagger/dagger-for-github@v6
+  #       with:
+  #         version: latest
+  #         verb: call
+  #         args: test --root=.
+  #         cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+  e2e:
+    name: End-to-end test all examples
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run unit tests
-        uses: dagger/dagger-for-github@v6
+      - uses: actions/setup-go@v5
         with:
-          version: latest
-          verb: call
-          args: test --root=.
-          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          go-version: '1.23.6'
+      - name: Run all examples
+        run: ./scripts/test.sh

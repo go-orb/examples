@@ -23,7 +23,6 @@ import (
 	// Own imports.
 	echoproto "github.com/go-orb/examples/benchmarks/rps/proto/echo"
 
-	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/client/orb"
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
@@ -31,6 +30,8 @@ import (
 	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
+
+	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/registry/consul"
 
 	_ "github.com/go-orb/plugins/client/middleware/log"
