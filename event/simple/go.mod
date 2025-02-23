@@ -3,14 +3,14 @@ module github.com/go-orb/examples/event/simple
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.0.0-20250220192804-1f05260015f2
-	github.com/go-orb/plugins/codecs/json v0.0.0-20250220201609-166b27343f72
-	github.com/go-orb/plugins/codecs/proto v0.0.0-20250220201609-166b27343f72
-	github.com/go-orb/plugins/config/source/cli/urfave v0.0.0-20250220201609-166b27343f72
-	github.com/go-orb/plugins/event/natsjs v0.0.0-20250220201609-166b27343f72
-	github.com/go-orb/plugins/log/slog v0.0.0-20250220201609-166b27343f72
+	github.com/go-orb/go-orb v0.0.0-20250223062516-2e68b601dde6
+	github.com/go-orb/plugins/codecs/json v0.0.0-20250223040058-5bd64d3e489b
+	github.com/go-orb/plugins/codecs/proto v0.0.0-20250223040058-5bd64d3e489b
+	github.com/go-orb/plugins/config/source/cli/urfave v0.0.0-20250223040058-5bd64d3e489b
+	github.com/go-orb/plugins/event/natsjs v0.0.0-20250223040058-5bd64d3e489b
+	github.com/go-orb/plugins/log/slog v0.0.0-20250223040058-5bd64d3e489b
+	github.com/go-orb/wire v0.7.0
 	github.com/google/uuid v1.6.0
-	github.com/google/wire v0.6.0
 	google.golang.org/protobuf v1.36.5
 )
 

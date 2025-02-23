@@ -14,7 +14,7 @@ import (
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
-	"github.com/google/wire"
+	"github.com/go-orb/wire"
 )
 
 // provideConfigData reads the config from cli and returns it.

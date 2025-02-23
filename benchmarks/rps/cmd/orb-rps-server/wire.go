@@ -19,7 +19,7 @@ import (
 	mgrpc "github.com/go-orb/plugins/server/grpc"
 	mhttp "github.com/go-orb/plugins/server/http"
 
-	"github.com/google/wire"
+	"github.com/go-orb/wire"
 )
 
 // provideConfigData reads the config from cli and returns it.
