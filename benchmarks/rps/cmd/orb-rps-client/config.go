@@ -89,7 +89,7 @@ func init2() {
 		"transport",
 		defaultTransport,
 		cli.ConfigPathSlice([]string{configSection, "transport"}),
-		cli.Usage("Transport to use (grpc, hertzhttp, http, uvm.)"),
+		cli.Usage("Transport to use (grpc, drpc, http, uvm.)"),
 		cli.EnvVars("TRANSPORT"),
 	))
 	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
