@@ -1,0 +1,28 @@
+orb:
+  examples:
+    rest:
+      middleware:
+        # The "client" service config
+        client:
+          client:
+            preferredTransports: ["drpc"]
+            anyTransport: false
+            middlewares:
+              - name: log
+          logger:
+            format: text
+            level: TRACE
+
+        # The "server" service config
+        server:
+          server:
+            handlers:
+              - echo.Echo
+            entrypoints:
+              - name: drpc
+                plugin: drpc
+                insecure: true
+                reflection: false
+          logger:
+            format: json
+            level: TRACE
