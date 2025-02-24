@@ -34,6 +34,21 @@ A simple example of a go-orb service and client with a REST middleware.
 
 In it's [config](rest/middleware/config) folder you can find a variaty of config files for different transports as well as logging options and registries. All of them run with the same code/binary.
 
+## Running
+
+To run an example you need to have `go1.23.6` installed. You can get it with [gvm](https://github.com/moovweb/gvm).
+
+All the examples have a cmd folder you can run it with `go run "./cmd/handler/..."`.
+
+## Development
+
+You need:
+- go1.23.6
+- our custom fork of [wire](https://github.com/go-orb/wire) `go install github.com/go-orb/wire/cmd/wire@latest`
+- [protoc-gen-go-orb](https://github.com/go-orb/plugins/server/cmd/protoc-gen-go-orb) `go install github.com/go-orb/plugins/server/cmd/protoc-gen-go-orb@latest`
+
+Now you'r able to run `go generate ./...` in the examples to update `cmd/xyz/wire_gen.go` as well as the `proto` files.
+
 ## Authors
 
 ### go-orb
