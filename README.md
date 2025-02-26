@@ -36,7 +36,7 @@ In it's [config](rest/middleware/config) folder you can find a variaty of config
 
 ## Running
 
-To run an example you need to have `go1.23.6` installed. You can get it with [gvm](https://github.com/moovweb/gvm).
+To run an example you need to have `go1.23.6` or later installed. You can get it with [gvm](https://github.com/moovweb/gvm).
 
 All the examples have a cmd folder you can run it with `go run "./cmd/handler/..."`.
 
@@ -45,7 +45,7 @@ You can run all examples at once by running `./scripts/test.sh`, this is what we
 ## Development
 
 You need:
-- go1.23.6
+- go1.23.6 or later
 - docker for dagger
 - our custom fork of [wire](https://github.com/go-orb/wire) `go install github.com/go-orb/wire/cmd/wire@latest`
 - [protoc-gen-go](https://protobuf.dev/reference/go/go-generated/) `go install google.golang.org/protobuf/cmd/protoc-gen-go@latest`
