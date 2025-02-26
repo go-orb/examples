@@ -17,6 +17,7 @@ tasks:
       - cmd: dagger call update --root=. source export --path=.
 
   test:
-    desc: Run "go test ./..." in all packages
+    desc: Run "go test ./..." in all packages and then "./scripts/test.sh" to test all binaries.
     cmds:
       - cmd: dagger call test --root=.
+      - cmd: ./scripts/test.sh

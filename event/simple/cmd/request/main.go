@@ -3,7 +3,7 @@ package main
 
 import (
 	"context"
-	"os"
+	"fmt"
 
 	"github.com/go-orb/examples/event/simple/pb/user_new"
 	"github.com/go-orb/go-orb/event"
@@ -25,7 +25,7 @@ func runner(
 	resp, err := event.Request[user_new.Resp](context.Background(), eventHandler, "user.new", req)
 	if err != nil {
 		logger.Error("while requesting", "err", err)
-		os.Exit(1)
+		return fmt.Errorf("while requesting: %w", err)
 	}
 
 	logger.Info("New id for user", "name", resp.GetName(), "uuid", resp.GetUuid())

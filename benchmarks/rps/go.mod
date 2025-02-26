@@ -3,14 +3,13 @@ module github.com/go-orb/examples/benchmarks/rps
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.1.0
+	github.com/go-orb/go-orb v0.1.1
 	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250224045217-34f042e80ea5
-	github.com/go-orb/plugins/client/middleware/log v0.1.0
-	github.com/go-orb/plugins/client/orb v0.1.1
+	github.com/go-orb/plugins/client/orb v0.1.3
 	github.com/go-orb/plugins/client/orb/transport/drpc v0.1.0
 	github.com/go-orb/plugins/client/orb/transport/grpc v0.1.0
 	github.com/go-orb/plugins/client/orb/transport/h2c v0.1.0
-	github.com/go-orb/plugins/client/orb/transport/http v0.1.0
+	github.com/go-orb/plugins/client/orb/transport/http v0.1.1
 	github.com/go-orb/plugins/client/orb/transport/http3 v0.1.0
 	github.com/go-orb/plugins/client/orb/transport/https v0.1.0
 	github.com/go-orb/plugins/codecs/json v0.1.0
@@ -67,7 +66,7 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/zeebo/errs v1.4.0 // indirect
 	go.uber.org/mock v0.5.0 // indirect
-	golang.org/x/crypto v0.34.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/net v0.35.0 // indirect
@@ -75,7 +74,7 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/tools v0.30.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250219182151-9fdb1cabc7b2 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250224174004-546df14abb99 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -40,11 +40,15 @@ To run an example you need to have `go1.23.6` installed. You can get it with [gv
 
 All the examples have a cmd folder you can run it with `go run "./cmd/handler/..."`.
 
+You can run all examples at once by running `./scripts/test.sh`, this is what we do in CI.
+
 ## Development
 
 You need:
 - go1.23.6
+- docker for dagger
 - our custom fork of [wire](https://github.com/go-orb/wire) `go install github.com/go-orb/wire/cmd/wire@latest`
+- [protoc-gen-go](https://protobuf.dev/reference/go/go-generated/) `go install google.golang.org/protobuf/cmd/protoc-gen-go@latest`
 - [protoc-gen-go-orb](https://github.com/go-orb/plugins/server/cmd/protoc-gen-go-orb) `go install github.com/go-orb/plugins/server/cmd/protoc-gen-go-orb@latest`
 
 Now you'r able to run `go generate ./...` in the examples to update `cmd/xyz/wire_gen.go` as well as the `proto` files.

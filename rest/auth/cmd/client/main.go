@@ -25,6 +25,15 @@ import (
 	_ "github.com/go-orb/plugins/client/orb/transport/drpc"
 )
 
+// provideLoggerOpts returns the logger options.
+func provideLoggerOpts() ([]log.Option, error) {
+	return []log.Option{log.WithLevel("TRACE")}, nil
+}
+
+func provideClientOpts() ([]client.Option, error) {
+	return []client.Option{client.WithClientMiddleware(client.MiddlewareConfig{Name: "log"})}, nil
+}
+
 func runner(
 	logger log.Logger,
 	clientWire client.Type,

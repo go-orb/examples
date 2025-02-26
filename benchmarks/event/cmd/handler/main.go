@@ -17,6 +17,9 @@ import (
 )
 
 func runner(
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger,
 	eventWire event.Handler,
 	done chan os.Signal,
 ) error {
@@ -28,8 +31,12 @@ func runner(
 
 	event.HandleRequest(ctx, eventWire, "echo.echo", echoHandler)
 
+	logger.Info("Started", "name", serviceName, "version", serviceVersion)
+
 	// Blocks until sigterm/sigkill.
 	<-done
+
+	logger.Info("Stopping", "name", serviceName, "version", serviceVersion)
 
 	cancel()
 
@@ -38,7 +45,7 @@ func runner(
 
 func main() {
 	var (
-		serviceName    = types.ServiceName("orb.examples.event.bench_handler")
+		serviceName    = types.ServiceName("benchmarks.event.handler")
 		serviceVersion = types.ServiceVersion("v0.0.1")
 	)
 

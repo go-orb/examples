@@ -7,12 +7,17 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
 	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 import (
@@ -33,35 +38,35 @@ import (
 
 // Injectors from wire.go:
 
-// newComponents combines everything above and returns a slice of components.
-func newComponents(serviceName types.ServiceName, serviceVersion types.ServiceVersion) ([]types.Component, error) {
+// run combines everything above and runs the callback.
+func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
 	configData, err := provideConfigData(serviceName, serviceVersion)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	v := _wireValue
 	logger, err := log.Provide(serviceName, configData, v...)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	v2 := _wireValue2
 	registryType, err := registry.Provide(serviceName, serviceVersion, configData, logger, v2...)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	v3, err := provideServerOpts(logger)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	serverServer, err := server.Provide(serviceName, configData, logger, registryType, v3...)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	v4, err := provideComponents(logger, registryType, serverServer)
+	mainWireRunResult, err := wireRun(serviceName, serviceVersion, logger, serverServer, cb)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return v4, nil
+	return mainWireRunResult, nil
 }
 
 var (
@@ -88,16 +93,47 @@ func provideConfigData(
 	return data, err
 }
 
-// provideComponents creates a slice of components out of the arguments.
-func provideComponents(
-	logger log.Logger,
-	reg registry.Type,
-	srv server.Server,
-) ([]types.Component, error) {
-	components := []types.Component{}
-	components = append(components, logger)
-	components = append(components, reg)
-	components = append(components, &srv)
+// wireRunResult is here so "wire" has a type for the return value of wireRun.
+// wire needs a explicit type for each provider including "wireRun".
+type wireRunResult string
 
-	return components, nil
+// wireRunCallback is the actual code that runs the business logic.
+type wireRunCallback func(
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger,
+	done chan os.Signal,
+) error
+
+func wireRun(
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger,
+	_ server.Server,
+	cb wireRunCallback,
+) (wireRunResult, error) {
+
+	for _, c := range types.Components.Iterate(false) {
+		err := c.Start()
+		if err != nil {
+			logger.Error("Failed to start", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+			os.Exit(1)
+		}
+	}
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+
+	runErr := cb(serviceName, serviceVersion, logger, done)
+
+	ctx := context.Background()
+
+	for _, c := range types.Components.Iterate(true) {
+		err := c.Stop(ctx)
+		if err != nil {
+			logger.Error("Failed to stop", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+		}
+	}
+
+	return "", runErr
 }

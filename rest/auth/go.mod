@@ -3,10 +3,10 @@ module github.com/go-orb/examples/rest/auth
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.1.0
+	github.com/go-orb/go-orb v0.1.1
 	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250224045217-34f042e80ea5
 	github.com/go-orb/plugins/client/middleware/log v0.1.0
-	github.com/go-orb/plugins/client/orb v0.1.1
+	github.com/go-orb/plugins/client/orb v0.1.3
 	github.com/go-orb/plugins/client/orb/transport/drpc v0.1.0
 	github.com/go-orb/plugins/codecs/json v0.1.0
 	github.com/go-orb/plugins/codecs/proto v0.1.0

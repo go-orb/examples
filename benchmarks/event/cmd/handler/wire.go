@@ -5,6 +5,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
 	"os/signal"
@@ -34,39 +35,31 @@ func provideConfigData(
 	return data, err
 }
 
-// provideComponents creates a slice of components out of the arguments.
-func provideComponents(
-	logger log.Logger,
-	event event.Handler,
-) ([]types.Component, error) {
-	components := []types.Component{}
-	components = append(components, logger)
-	components = append(components, event)
-
-	return components, nil
-}
-
+// wireRunResult is here so "wire" has a type for the return value of wireRun.
+// wire needs a explicit type for each provider including "wireRun".
 type wireRunResult string
 
+// wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger,
 	event event.Handler,
 	done chan os.Signal,
 ) error
 
 func wireRun(
-	_ types.ServiceName,
-	components []types.Component,
-	_ types.ConfigData,
-	_ log.Logger,
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger,
 	event event.Handler,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
-	//
 	// Orb start
-	for _, c := range components {
+	for _, c := range types.Components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
-			log.Error("Failed to start", err, "component", c.Type())
+			logger.Error("Failed to start", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 			os.Exit(1)
 		}
 	}
@@ -76,18 +69,15 @@ func wireRun(
 
 	//
 	// Actual code
-	runErr := cb(event, done)
+	runErr := cb(serviceName, serviceVersion, logger, event, done)
 
-	//
 	// Orb shutdown.
 	ctx := context.Background()
 
-	for k := range components {
-		c := components[len(components)-1-k]
-
+	for _, c := range types.Components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
-			log.Error("Failed to stop", err, "component", c.Type())
+			logger.Error("Failed to stop", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 		}
 	}
 
@@ -106,7 +96,6 @@ func run(
 		log.Provide,
 		wire.Value([]event.Option{}),
 		event.Provide,
-		provideComponents,
 		wireRun,
 	))
 }

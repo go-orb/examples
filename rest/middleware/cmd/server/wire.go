@@ -5,7 +5,12 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
@@ -33,25 +38,60 @@ func provideConfigData(
 	return data, err
 }
 
-// provideComponents creates a slice of components out of the arguments.
-func provideComponents(
-	logger log.Logger,
-	reg registry.Type,
-	srv server.Server,
-) ([]types.Component, error) {
-	components := []types.Component{}
-	components = append(components, logger)
-	components = append(components, reg)
-	components = append(components, &srv)
+// wireRunResult is here so "wire" has a type for the return value of wireRun.
+// wire needs a explicit type for each provider including "wireRun".
+type wireRunResult string
 
-	return components, nil
-}
-
-// newComponents combines everything above and returns a slice of components.
-func newComponents(
+// wireRunCallback is the actual code that runs the business logic.
+type wireRunCallback func(
 	serviceName types.ServiceName,
 	serviceVersion types.ServiceVersion,
-) ([]types.Component, error) {
+	logger log.Logger,
+	done chan os.Signal,
+) error
+
+func wireRun(
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger,
+	_ server.Server,
+	cb wireRunCallback,
+) (wireRunResult, error) {
+	// Orb start
+	for _, c := range types.Components.Iterate(false) {
+		err := c.Start()
+		if err != nil {
+			logger.Error("Failed to start", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+			os.Exit(1)
+		}
+	}
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+
+	//
+	// Actual code
+	runErr := cb(serviceName, serviceVersion, logger, done)
+
+	// Orb shutdown.
+	ctx := context.Background()
+
+	for _, c := range types.Components.Iterate(true) {
+		err := c.Stop(ctx)
+		if err != nil {
+			logger.Error("Failed to stop", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+		}
+	}
+
+	return "", runErr
+}
+
+// run combines everything above and runs the callback.
+func run(
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	cb wireRunCallback,
+) (wireRunResult, error) {
 	panic(wire.Build(
 		provideConfigData,
 		wire.Value([]log.Option{}),
@@ -60,6 +100,6 @@ func newComponents(
 		registry.Provide,
 		provideServerOpts,
 		server.Provide,
-		provideComponents,
+		wireRun,
 	))
 }

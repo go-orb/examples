@@ -2,10 +2,7 @@
 package main
 
 import (
-	"context"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
@@ -22,41 +19,29 @@ import (
 	_ "github.com/go-orb/plugins/server/http/router/chi"
 )
 
+func runner(
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger,
+	done chan os.Signal,
+) error {
+	logger.Info("Started", "name", serviceName, "version", serviceVersion)
+
+	// Blocks until the process receives a signal.
+	<-done
+
+	logger.Info("Stopping", "name", serviceName, "version", serviceVersion)
+
+	return nil
+}
+
 func main() {
 	var (
 		serviceName    = types.ServiceName("benchmarks.rps.server")
 		serviceVersion = types.ServiceVersion("v0.0.1")
 	)
 
-	components, err := newComponents(serviceName, serviceVersion)
-	if err != nil {
-		log.Error("while creating components", "err", err)
-		os.Exit(1)
-	}
-
-	for _, c := range components {
-		err := c.Start()
-		if err != nil {
-			log.Error("Failed to start", err, "component", c.Type())
-			os.Exit(1)
-		}
-	}
-
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
-
-	// Blocks until we get a sigint/sigterm
-	<-done
-
-	// Shutdown.
-	ctx := context.Background()
-
-	for k := range components {
-		c := components[len(components)-1-k]
-
-		err := c.Stop(ctx)
-		if err != nil {
-			log.Error("Failed to stop", err, "component", c.Type())
-		}
+	if _, err := run(serviceName, serviceVersion, runner); err != nil {
+		log.Error("while running", "err", err)
 	}
 }

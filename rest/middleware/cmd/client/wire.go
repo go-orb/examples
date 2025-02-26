@@ -5,8 +5,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/config"
@@ -33,18 +36,6 @@ func provideConfigData(
 	return data, err
 }
 
-// provideComponents creates a slice of components out of the arguments.
-func provideComponents(
-	logger log.Logger,
-	client client.Type,
-) ([]types.Component, error) {
-	components := []types.Component{}
-	components = append(components, logger)
-	components = append(components, client)
-
-	return components, nil
-}
-
 type wireRunResult string
 
 type wireRunCallback func(
@@ -53,37 +44,33 @@ type wireRunCallback func(
 ) error
 
 func wireRun(
-	_ types.ServiceName,
-	components []types.Component,
-	_ types.ConfigData,
 	logger log.Logger,
 	client client.Type,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
-	//
 	// Orb start
-	for _, c := range components {
+	for _, c := range types.Components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
-			log.Error("Failed to start", err, "component", c.Type())
+			logger.Error("Failed to start", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 			os.Exit(1)
 		}
 	}
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
 	//
 	// Actual code
 	runErr := cb(logger, client)
 
-	//
 	// Orb shutdown.
 	ctx := context.Background()
 
-	for k := range components {
-		c := components[len(components)-1-k]
-
+	for _, c := range types.Components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
-			log.Error("Failed to stop", err, "component", c.Type())
+			logger.Error("Failed to stop", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 		}
 	}
 
@@ -104,7 +91,6 @@ func run(
 		registry.Provide,
 		wire.Value([]client.Option{}),
 		client.Provide,
-		provideComponents,
 		wireRun,
 	))
 }

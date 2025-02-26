@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
@@ -44,11 +45,7 @@ func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb 
 	if err != nil {
 		return "", err
 	}
-	v3, err := provideComponents(logger, handler)
-	if err != nil {
-		return "", err
-	}
-	mainWireRunResult, err := wireRun(serviceName, v3, configData, logger, handler, cb)
+	mainWireRunResult, err := wireRun(logger, handler, cb)
 	if err != nil {
 		return "", err
 	}
@@ -79,18 +76,6 @@ func provideConfigData(
 	return data, err
 }
 
-// provideComponents creates a slice of components out of the arguments.
-func provideComponents(
-	logger log.Logger, event2 event.Handler,
-
-) ([]types.Component, error) {
-	components := []types.Component{}
-	components = append(components, logger)
-	components = append(components, event2)
-
-	return components, nil
-}
-
 type wireRunResult string
 
 type wireRunCallback func(event2 event.Handler,
@@ -99,18 +84,15 @@ type wireRunCallback func(event2 event.Handler,
 ) error
 
 func wireRun(
-	_ types.ServiceName,
-	components []types.Component,
-	_ types.ConfigData,
-	_ log.Logger, event2 event.Handler,
+	logger log.Logger, event2 event.Handler,
 
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 
-	for _, c := range components {
+	for _, c := range types.Components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
-			log.Error("Failed to start", err, "component", c.Type())
+			logger.Error("Failed to start", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 			os.Exit(1)
 		}
 	}
@@ -122,12 +104,10 @@ func wireRun(
 
 	ctx := context.Background()
 
-	for k := range components {
-		c := components[len(components)-1-k]
-
+	for _, c := range types.Components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
-			log.Error("Failed to stop", err, "component", c.Type())
+			logger.Error("Failed to stop", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 		}
 	}
 

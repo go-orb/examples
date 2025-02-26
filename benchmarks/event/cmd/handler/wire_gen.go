@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
@@ -44,11 +45,7 @@ func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb 
 	if err != nil {
 		return "", err
 	}
-	v3, err := provideComponents(logger, handler)
-	if err != nil {
-		return "", err
-	}
-	mainWireRunResult, err := wireRun(serviceName, v3, configData, logger, handler, cb)
+	mainWireRunResult, err := wireRun(serviceName, serviceVersion, logger, handler, cb)
 	if err != nil {
 		return "", err
 	}
@@ -79,38 +76,31 @@ func provideConfigData(
 	return data, err
 }
 
-// provideComponents creates a slice of components out of the arguments.
-func provideComponents(
-	logger log.Logger, event2 event.Handler,
-
-) ([]types.Component, error) {
-	components := []types.Component{}
-	components = append(components, logger)
-	components = append(components, event2)
-
-	return components, nil
-}
-
+// wireRunResult is here so "wire" has a type for the return value of wireRun.
+// wire needs a explicit type for each provider including "wireRun".
 type wireRunResult string
 
-type wireRunCallback func(event2 event.Handler,
+// wireRunCallback is the actual code that runs the business logic.
+type wireRunCallback func(
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger, event2 event.Handler,
 
 	done chan os.Signal,
 ) error
 
 func wireRun(
-	_ types.ServiceName,
-	components []types.Component,
-	_ types.ConfigData,
-	_ log.Logger, event2 event.Handler,
+	serviceName types.ServiceName,
+	serviceVersion types.ServiceVersion,
+	logger log.Logger, event2 event.Handler,
 
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 
-	for _, c := range components {
+	for _, c := range types.Components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
-			log.Error("Failed to start", err, "component", c.Type())
+			logger.Error("Failed to start", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 			os.Exit(1)
 		}
 	}
@@ -118,16 +108,14 @@ func wireRun(
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
-	runErr := cb(event2, done)
+	runErr := cb(serviceName, serviceVersion, logger, event2, done)
 
 	ctx := context.Background()
 
-	for k := range components {
-		c := components[len(components)-1-k]
-
+	for _, c := range types.Components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
-			log.Error("Failed to stop", err, "component", c.Type())
+			logger.Error("Failed to stop", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 		}
 	}
 
