@@ -36,8 +36,8 @@ func wireRun(
 	for _, c := range types.Components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
-			logger.Error("Failed to start", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
-			os.Exit(1)
+			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+			return "", err
 		}
 	}
 
@@ -54,7 +54,7 @@ func wireRun(
 	for _, c := range types.Components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
-			logger.Error("Failed to stop", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+			logger.Error("Failed to stop", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 		}
 	}
 

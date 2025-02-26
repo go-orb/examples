@@ -21,3 +21,15 @@ tasks:
     cmds:
       - cmd: dagger call test --root=.
       - cmd: ./scripts/test.sh
+
+  generate:
+    desc: "Run go generate ./... in all packages."
+    cmds:
+    - |
+      for i in $(find . -type d); do 
+        [[ ! -f $i/go.mod ]] && continue
+        pushd $i 1>/dev/null
+        echo $i
+        go generate ./... || true
+        popd 1>/dev/null
+      done
