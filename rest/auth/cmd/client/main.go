@@ -30,6 +30,7 @@ func provideLoggerOpts() ([]log.Option, error) {
 	return []log.Option{log.WithLevel("TRACE")}, nil
 }
 
+//nolint:unparam
 func provideClientOpts() ([]client.Option, error) {
 	return []client.Option{client.WithClientMiddleware(client.MiddlewareConfig{Name: "log"})}, nil
 }
