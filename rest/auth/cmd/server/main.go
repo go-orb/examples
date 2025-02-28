@@ -9,7 +9,7 @@ import (
 	"github.com/go-orb/go-orb/types"
 
 	authHandler "github.com/go-orb/examples/rest/auth/handler/auth"
-	authProto "github.com/go-orb/examples/rest/auth/proto/auth"
+	authV1Proto "github.com/go-orb/examples/rest/auth/proto/auth_v1"
 
 	mdrpc "github.com/go-orb/plugins/server/drpc"
 
@@ -33,8 +33,8 @@ func provideServerOpts(logger log.Logger) ([]server.ConfigOption, error) {
 
 	// Register server Handlers.
 	hInstance := authHandler.New([]byte("thisIsAWellKnownSecretItCallsForHackMe"), logger)
-	hRegister := authProto.RegisterAuthHandler(hInstance)
-	server.Handlers.Add(authProto.HandlerAuth, hRegister)
+	hRegister := authV1Proto.RegisterAuthHandler(hInstance)
+	server.Handlers.Add(authV1Proto.HandlerAuth, hRegister)
 
 	opts = append(opts, server.WithEntrypointConfig(mdrpc.NewConfig(
 		mdrpc.WithName("drpc"),

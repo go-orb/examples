@@ -4,9 +4,9 @@
 // - protoc-gen-go-orb        v0.0.1
 // - protoc                   v5.29.2
 //
-// Proto source: auth/auth.proto
+// Proto source: auth_v1/auth.proto
 
-package auth
+package auth_v1
 
 import (
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -23,29 +23,29 @@ import (
 )
 
 // HandlerAuth is the name of a service, it's here to static type/reference.
-const HandlerAuth = "auth.Auth"
+const HandlerAuth = "auth.v1.Auth"
 
-// AuthClient is the client for auth.Auth
+// AuthClient is the client for auth.v1.Auth
 type AuthClient struct {
 	client client.Client
 }
 
-// NewAuthClient creates a new client for auth.Auth
+// NewAuthClient creates a new client for auth.v1.Auth
 func NewAuthClient(client client.Client) *AuthClient {
 	return &AuthClient{client: client}
 }
 
 // Login calls Login.
 func (c *AuthClient) Login(ctx context.Context, service string, req *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
-	return client.Call[LoginResponse](ctx, c.client, service, "auth.Auth/Login", req, opts...)
+	return client.Call[LoginResponse](ctx, c.client, service, "auth.v1.Auth/Login", req, opts...)
 }
 
 // Introspect calls Introspect.
 func (c *AuthClient) Introspect(ctx context.Context, service string, req *emptypb.Empty, opts ...client.CallOption) (*IntrospectResponse, error) {
-	return client.Call[IntrospectResponse](ctx, c.client, service, "auth.Auth/Introspect", req, opts...)
+	return client.Call[IntrospectResponse](ctx, c.client, service, "auth.v1.Auth/Introspect", req, opts...)
 }
 
-// AuthHandler is the Handler for auth.Auth
+// AuthHandler is the Handler for auth.v1.Auth
 type AuthHandler interface {
 	Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error)
 
@@ -66,8 +66,8 @@ func registerAuthDRPCHandler(srv *mdrpc.Server, handler AuthHandler) error {
 	}
 
 	// Add each endpoint name of this handler to the orb drpc server.
-	srv.AddEndpoint("/auth.Auth/Login")
-	srv.AddEndpoint("/auth.Auth/Introspect")
+	srv.AddEndpoint("/auth.v1.Auth/Login")
+	srv.AddEndpoint("/auth.v1.Auth/Introspect")
 
 	return nil
 }
@@ -81,7 +81,7 @@ func RegisterAuthHandler(handler AuthHandler) server.RegistrationFunc {
 		case *mdrpc.Server:
 			registerAuthDRPCHandler(srv, handler)
 		default:
-			log.Warn("No provider for this server found", "proto", "auth/auth.proto", "handler", "Auth", "server", s)
+			log.Warn("No provider for this server found", "proto", "auth_v1/auth.proto", "handler", "Auth", "server", s)
 		}
 	}
 }

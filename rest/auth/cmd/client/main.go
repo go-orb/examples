@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	// Own imports.
-	authproto "github.com/go-orb/examples/rest/auth/proto/auth"
+	authv1proto "github.com/go-orb/examples/rest/auth/proto/auth_v1"
 
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
@@ -40,10 +40,10 @@ func runner(
 	clientWire client.Type,
 ) error {
 	// Create a request.
-	req := &authproto.LoginRequest{Username: "someUserName", Password: "changeMe"}
+	req := &authv1proto.LoginRequest{Username: "someUserName", Password: "changeMe"}
 
 	// Run the query.
-	authClient := authproto.NewAuthClient(clientWire)
+	authClient := authv1proto.NewAuthClient(clientWire)
 	tokenResp, err := authClient.Login(context.Background(), "orb.examples.rest.auth.server", req)
 
 	if err != nil {

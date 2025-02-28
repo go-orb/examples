@@ -17,6 +17,7 @@ import (
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/types"
+	"github.com/go-orb/plugins/config/source/cli/urfave"
 
 	"github.com/go-orb/wire"
 )
@@ -90,7 +91,7 @@ func run(
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	panic(wire.Build(
-		provideConfigData,
+		urfave.ProvideConfigData,
 		wire.Value([]log.Option{}),
 		log.Provide,
 		wire.Value([]registry.Option{}),

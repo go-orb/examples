@@ -14,6 +14,7 @@ import (
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/types"
+	"github.com/go-orb/plugins/config/source/cli/urfave"
 	"net/url"
 	"os"
 	"os/signal"
@@ -42,7 +43,7 @@ import (
 
 // newComponents combines everything above and returns a slice of components.
 func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
-	configData, err := provideConfigData(serviceName, serviceVersion)
+	configData, err := urfave.ProvideConfigData(serviceName, serviceVersion)
 	if err != nil {
 		return "", err
 	}

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package auth;
+package auth.v1;
 
-option go_package = "./auth;auth";
+option go_package = "./auth;auth_v1";
 
 import "google/protobuf/empty.proto";
 

@@ -7,36 +7,18 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
+	"github.com/go-orb/plugins/config/source/cli/urfave"
 
 	"github.com/go-orb/wire"
 )
-
-// provideConfigData reads the config from cli and returns it.
-func provideConfigData(
-	serviceName types.ServiceName,
-	_ types.ServiceVersion,
-) (types.ConfigData, error) {
-	u, err := url.Parse("cli://urfave")
-	if err != nil {
-		return nil, err
-	}
-
-	cfgSections := types.SplitServiceName(serviceName)
-
-	data, err := config.Read([]*url.URL{u}, cfgSections)
-
-	return data, err
-}
 
 // wireRunResult is here so "wire" has a type for the return value of wireRun.
 // wire needs a explicit type for each provider including "wireRun".
@@ -93,7 +75,7 @@ func run(
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	panic(wire.Build(
-		provideConfigData,
+		urfave.ProvideConfigData,
 		wire.Value([]log.Option{}),
 		log.Provide,
 		wire.Value([]registry.Option{}),

@@ -4,9 +4,9 @@
 // - protoc-gen-go-orb        v0.0.1
 // - protoc                   v5.29.2
 //
-// source: auth/auth.proto
+// source: auth_v1/auth.proto
 
-package auth
+package auth_v1
 
 import (
 	context "context"
@@ -18,25 +18,25 @@ import (
 	drpcerr "storj.io/drpc/drpcerr"
 )
 
-type drpcEncoding_File_auth_auth_proto struct{}
+type drpcEncoding_File_auth_v1_auth_proto struct{}
 
-func (drpcEncoding_File_auth_auth_proto) Marshal(msg drpc.Message) ([]byte, error) {
+func (drpcEncoding_File_auth_v1_auth_proto) Marshal(msg drpc.Message) ([]byte, error) {
 	return proto.Marshal(msg.(proto.Message))
 }
 
-func (drpcEncoding_File_auth_auth_proto) MarshalAppend(buf []byte, msg drpc.Message) ([]byte, error) {
+func (drpcEncoding_File_auth_v1_auth_proto) MarshalAppend(buf []byte, msg drpc.Message) ([]byte, error) {
 	return proto.MarshalOptions{}.MarshalAppend(buf, msg.(proto.Message))
 }
 
-func (drpcEncoding_File_auth_auth_proto) Unmarshal(buf []byte, msg drpc.Message) error {
+func (drpcEncoding_File_auth_v1_auth_proto) Unmarshal(buf []byte, msg drpc.Message) error {
 	return proto.Unmarshal(buf, msg.(proto.Message))
 }
 
-func (drpcEncoding_File_auth_auth_proto) JSONMarshal(msg drpc.Message) ([]byte, error) {
+func (drpcEncoding_File_auth_v1_auth_proto) JSONMarshal(msg drpc.Message) ([]byte, error) {
 	return protojson.Marshal(msg.(proto.Message))
 }
 
-func (drpcEncoding_File_auth_auth_proto) JSONUnmarshal(buf []byte, msg drpc.Message) error {
+func (drpcEncoding_File_auth_v1_auth_proto) JSONUnmarshal(buf []byte, msg drpc.Message) error {
 	return protojson.Unmarshal(buf, msg.(proto.Message))
 }
 
@@ -62,7 +62,7 @@ func (DRPCAuthDescription) NumMethods() int { return 2 }
 func (DRPCAuthDescription) Method(n int) (string, drpc.Encoding, drpc.Receiver, interface{}, bool) {
 	switch n {
 	case 0:
-		return "/auth.Auth/Login", drpcEncoding_File_auth_auth_proto{},
+		return "/auth.v1.Auth/Login", drpcEncoding_File_auth_v1_auth_proto{},
 			func(srv interface{}, ctx context.Context, in1, in2 interface{}) (drpc.Message, error) {
 				return srv.(DRPCAuthServer).
 					Login(
@@ -71,7 +71,7 @@ func (DRPCAuthDescription) Method(n int) (string, drpc.Encoding, drpc.Receiver, 
 					)
 			}, DRPCAuthServer.Login, true
 	case 1:
-		return "/auth.Auth/Introspect", drpcEncoding_File_auth_auth_proto{},
+		return "/auth.v1.Auth/Introspect", drpcEncoding_File_auth_v1_auth_proto{},
 			func(srv interface{}, ctx context.Context, in1, in2 interface{}) (drpc.Message, error) {
 				return srv.(DRPCAuthServer).
 					Introspect(
@@ -98,7 +98,7 @@ func (x *drpcAuth_LoginStream) GetStream() drpc.Stream {
 }
 
 func (x *drpcAuth_LoginStream) SendAndClose(m *LoginResponse) error {
-	if err := x.MsgSend(m, drpcEncoding_File_auth_auth_proto{}); err != nil {
+	if err := x.MsgSend(m, drpcEncoding_File_auth_v1_auth_proto{}); err != nil {
 		return err
 	}
 	return x.CloseSend()
@@ -118,7 +118,7 @@ func (x *drpcAuth_IntrospectStream) GetStream() drpc.Stream {
 }
 
 func (x *drpcAuth_IntrospectStream) SendAndClose(m *IntrospectResponse) error {
-	if err := x.MsgSend(m, drpcEncoding_File_auth_auth_proto{}); err != nil {
+	if err := x.MsgSend(m, drpcEncoding_File_auth_v1_auth_proto{}); err != nil {
 		return err
 	}
 	return x.CloseSend()

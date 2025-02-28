@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-orb/examples/rest/auth/proto/auth"
+	authV1Proto "github.com/go-orb/examples/rest/auth/proto/auth_v1"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/util/metadata"
 	"github.com/go-orb/go-orb/util/orberrors"
@@ -19,7 +19,7 @@ import (
 const authorizationHeaderName = "authorization"
 const authorizationPrefix = "Bearer "
 
-var _ auth.AuthHandler = (*Handler)(nil)
+var _ authV1Proto.AuthHandler = (*Handler)(nil)
 
 // Handler is a test handler.
 type Handler struct {
@@ -36,7 +36,7 @@ func New(tokenSecret []byte, logger log.Logger) *Handler {
 }
 
 // Login implements the fake login method.
-func (h *Handler) Login(_ context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
+func (h *Handler) Login(_ context.Context, req *authV1Proto.LoginRequest) (*authV1Proto.LoginResponse, error) {
 	if req.GetUsername() != "someUserName" || req.GetPassword() != "changeMe" {
 		return nil, orberrors.ErrUnauthorized
 	}
@@ -52,7 +52,7 @@ func (h *Handler) Login(_ context.Context, req *auth.LoginRequest) (*auth.LoginR
 		return nil, orberrors.ErrInternalServerError
 	}
 
-	resp := &auth.LoginResponse{
+	resp := &authV1Proto.LoginResponse{
 		Token: tokenString,
 	}
 
@@ -60,7 +60,7 @@ func (h *Handler) Login(_ context.Context, req *auth.LoginRequest) (*auth.LoginR
 }
 
 // Introspect returns data from the token.
-func (h *Handler) Introspect(ctx context.Context, _ *emptypb.Empty) (*auth.IntrospectResponse, error) {
+func (h *Handler) Introspect(ctx context.Context, _ *emptypb.Empty) (*authV1Proto.IntrospectResponse, error) {
 	md, ok := metadata.Incoming(ctx)
 	if !ok {
 		return nil, orberrors.ErrUnauthorized
@@ -89,5 +89,5 @@ func (h *Handler) Introspect(ctx context.Context, _ *emptypb.Empty) (*auth.Intro
 		return nil, orberrors.ErrInternalServerError
 	}
 
-	return &auth.IntrospectResponse{Username: claims["sub"].(string)}, nil //nolint:errcheck
+	return &authV1Proto.IntrospectResponse{Username: claims["sub"].(string)}, nil //nolint:errcheck
 }
