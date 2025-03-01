@@ -33,28 +33,32 @@ import (
 // run combines everything above and
 func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
 	configData := _wireConfigDataValue
-	v, err := provideLoggerOpts()
+	v, err := types.ProvideComponents()
 	if err != nil {
 		return "", err
 	}
-	logger, err := log.Provide(serviceName, configData, v...)
+	v2, err := provideLoggerOpts()
 	if err != nil {
 		return "", err
 	}
-	v2 := _wireValue
-	registryType, err := registry.Provide(serviceName, serviceVersion, configData, logger, v2...)
+	logger, err := log.Provide(serviceName, configData, v, v2...)
 	if err != nil {
 		return "", err
 	}
-	v3, err := provideClientOpts()
+	v3 := _wireValue
+	registryType, err := registry.Provide(serviceName, serviceVersion, configData, v, logger, v3...)
 	if err != nil {
 		return "", err
 	}
-	clientType, err := client.Provide(serviceName, configData, logger, registryType, v3...)
+	v4, err := provideClientOpts()
 	if err != nil {
 		return "", err
 	}
-	mainWireRunResult, err := wireRun(logger, clientType, cb)
+	clientType, err := client.Provide(serviceName, configData, v, logger, registryType, v4...)
+	if err != nil {
+		return "", err
+	}
+	mainWireRunResult, err := wireRun(logger, clientType, v, cb)
 	if err != nil {
 		return "", err
 	}
@@ -81,10 +85,11 @@ type wireRunCallback func(
 func wireRun(
 	logger log.Logger, client2 client.Type,
 
+	components *types.Components,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 
-	for _, c := range types.Components.Iterate(false) {
+	for _, c := range components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
@@ -99,7 +104,7 @@ func wireRun(
 
 	ctx := context.Background()
 
-	for _, c := range types.Components.Iterate(true) {
+	for _, c := range components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
 			logger.Error("Failed to stop", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))

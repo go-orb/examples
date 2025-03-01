@@ -29,29 +29,37 @@ import (
 
 // run combines everything above and runs the callback.
 func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
+	v, err := types.ProvideComponents()
+	if err != nil {
+		return "", err
+	}
 	configData := _wireConfigDataValue
-	v, err := provideLoggerOpts()
+	v2, err := provideLoggerOpts()
 	if err != nil {
 		return "", err
 	}
-	logger, err := log.Provide(serviceName, configData, v...)
+	logger, err := log.Provide(serviceName, configData, v, v2...)
 	if err != nil {
 		return "", err
 	}
-	v2 := _wireValue
-	registryType, err := registry.Provide(serviceName, serviceVersion, configData, logger, v2...)
+	v3 := _wireValue
+	registryType, err := registry.Provide(serviceName, serviceVersion, configData, v, logger, v3...)
 	if err != nil {
 		return "", err
 	}
-	v3, err := provideServerOpts(logger)
+	v4, err := provideServerOpts()
 	if err != nil {
 		return "", err
 	}
-	serverServer, err := server.Provide(serviceName, configData, logger, registryType, v3...)
+	serverServer, err := server.Provide(serviceName, configData, v, logger, registryType, v4...)
 	if err != nil {
 		return "", err
 	}
-	mainWireRunResult, err := wireRun(serviceName, serviceVersion, logger, serverServer, cb)
+	mainServerConfigured, err := provideServerConfigured(logger, serverServer)
+	if err != nil {
+		return "", err
+	}
+	mainWireRunResult, err := wireRun(serviceName, serviceVersion, v, logger, mainServerConfigured, cb)
 	if err != nil {
 		return "", err
 	}
@@ -77,15 +85,18 @@ type wireRunCallback func(
 	done chan os.Signal,
 ) error
 
+type serverConfigured struct{}
+
 func wireRun(
 	serviceName types.ServiceName,
 	serviceVersion types.ServiceVersion,
+	components *types.Components,
 	logger log.Logger,
-	_ server.Server,
+	_ serverConfigured,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 
-	for _, c := range types.Components.Iterate(false) {
+	for _, c := range components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
@@ -100,7 +111,7 @@ func wireRun(
 
 	ctx := context.Background()
 
-	for _, c := range types.Components.Iterate(true) {
+	for _, c := range components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
 			logger.Error("Failed to stop", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))

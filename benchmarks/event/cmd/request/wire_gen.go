@@ -34,17 +34,21 @@ func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb 
 	if err != nil {
 		return "", err
 	}
-	v := _wireValue
-	logger, err := log.Provide(serviceName, configData, v...)
+	v, err := types.ProvideComponents()
 	if err != nil {
 		return "", err
 	}
-	v2 := _wireValue2
-	handler, err := event.Provide(serviceName, configData, logger, v2...)
+	v2 := _wireValue
+	logger, err := log.Provide(serviceName, configData, v, v2...)
 	if err != nil {
 		return "", err
 	}
-	mainWireRunResult, err := wireRun(serviceName, configData, logger, handler, cb)
+	v3 := _wireValue2
+	handler, err := event.Provide(serviceName, configData, v, logger, v3...)
+	if err != nil {
+		return "", err
+	}
+	mainWireRunResult, err := wireRun(serviceName, configData, v, logger, handler, cb)
 	if err != nil {
 		return "", err
 	}
@@ -73,12 +77,13 @@ type wireRunCallback func(
 func wireRun(
 	serviceName types.ServiceName,
 	configs types.ConfigData,
+	components *types.Components,
 	logger log.Logger, event2 event.Handler,
 
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 
-	for _, c := range types.Components.Iterate(false) {
+	for _, c := range components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
@@ -93,7 +98,7 @@ func wireRun(
 
 	ctx := context.Background()
 
-	for _, c := range types.Components.Iterate(true) {
+	for _, c := range components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
 			logger.Error("Failed to stop", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))

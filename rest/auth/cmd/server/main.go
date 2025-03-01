@@ -25,25 +25,35 @@ func provideLoggerOpts() ([]log.Option, error) {
 	return []log.Option{log.WithLevel("TRACE")}, nil
 }
 
-// provideServerOpts provides options for the go-orb server and registers handlers.
+// provideServerOpts provides options for the go-orb server.
 //
 //nolint:unparam
-func provideServerOpts(logger log.Logger) ([]server.ConfigOption, error) {
+func provideServerOpts() ([]server.ConfigOption, error) {
 	opts := []server.ConfigOption{}
-
-	// Register server Handlers.
-	hInstance := authHandler.New([]byte("thisIsAWellKnownSecretItCallsForHackMe"), logger)
-	hRegister := authV1Proto.RegisterAuthHandler(hInstance)
-	server.Handlers.Add(authV1Proto.HandlerAuth, hRegister)
 
 	opts = append(opts, server.WithEntrypointConfig(mdrpc.NewConfig(
 		mdrpc.WithName("drpc"),
-		mdrpc.WithHandlers(hRegister),
 	)))
 
-	logger.Info("Started")
-
 	return opts, nil
+}
+
+// provideServerConfigured configures the go-orb server(s).
+//
+//nolint:unparam
+func provideServerConfigured(logger log.Logger, srv server.Server) (serverConfigured, error) {
+	// Register server Handlers.
+	hInstance := authHandler.New([]byte("thisIsAWellKnownSecretItCallsForHackMe"), logger)
+	hRegister := authV1Proto.RegisterAuthHandler(hInstance)
+
+	// Add our server handler to all entrypoints.
+	srv.GetEntrypoints().Range(func(_ string, entrypoint server.Entrypoint) bool {
+		entrypoint.AddHandler(hRegister)
+
+		return true
+	})
+
+	return serverConfigured{}, nil
 }
 
 func runner(serviceName types.ServiceName,

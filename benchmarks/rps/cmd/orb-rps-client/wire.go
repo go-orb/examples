@@ -51,12 +51,13 @@ type wireRunCallback func(
 func wireRun(
 	serviceName types.ServiceName,
 	configs types.ConfigData,
+	components *types.Components,
 	logger log.Logger,
 	cli client.Type,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	// Orb start
-	for _, c := range types.Components.Iterate(false) {
+	for _, c := range components.Iterate(false) {
 		err := c.Start()
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
@@ -74,7 +75,7 @@ func wireRun(
 	// Orb shutdown.
 	ctx := context.Background()
 
-	for _, c := range types.Components.Iterate(true) {
+	for _, c := range components.Iterate(true) {
 		err := c.Stop(ctx)
 		if err != nil {
 			logger.Error("Failed to stop", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
@@ -91,6 +92,7 @@ func run(
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	panic(wire.Build(
+		types.ProvideComponents,
 		urfave.ProvideConfigData,
 		wire.Value([]log.Option{}),
 		log.Provide,
