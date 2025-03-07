@@ -1,12 +1,17 @@
+// Package monolith implements the foobar example app.
 package monolith
 
 import (
 	"github.com/go-orb/go-orb/cli"
 )
 
+// Name is the name of the app.
 const Name = "foobar"
 
-var Version = "unset"
+// Version is the version of the app.
+//
+//nolint:gochecknoglobals
+var Version = ""
 
 // MainCommands returns commands specific to the service.
 func MainCommands() []*cli.Command {

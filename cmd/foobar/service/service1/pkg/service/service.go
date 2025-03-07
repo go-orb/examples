@@ -1,3 +1,4 @@
+// Package service implements the foobar.service1 service.
 package service
 
 import (
@@ -6,9 +7,13 @@ import (
 	"github.com/go-orb/go-orb/cli"
 )
 
+// Name is the service name.
 const Name = "foobar.service1"
 
-var Version = "unset"
+// Version is the service version.
+//
+//nolint:gochecknoglobals
+var Version = ""
 
 // MainCommands returns the commands which get appended to the "main/monolith" App.
 func MainCommands() []*cli.Command {
@@ -17,14 +22,14 @@ func MainCommands() []*cli.Command {
 			Name:        "service1",
 			Service:     Name,
 			Category:    "service",
-			Subcommands: ServiceCommands(),
+			Subcommands: Commands(),
 			NoAction:    true,
 		},
 	}
 }
 
-// ServiceCommands returns commands specific to the service.
-func ServiceCommands() []*cli.Command {
+// Commands returns commands specific to the service.
+func Commands() []*cli.Command {
 	return []*cli.Command{
 		{
 			Name:    "server",

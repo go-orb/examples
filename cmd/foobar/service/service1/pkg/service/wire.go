@@ -90,8 +90,7 @@ func ProvideRunner(
 		cli.ProvideConfigData,
 		cli.ProvideServiceName,
 
-		wire.Value([]log.Option{}),
-		log.Provide,
+		log.ProvideNoOpts,
 
 		provideActionServer,
 		provideActionHealth,

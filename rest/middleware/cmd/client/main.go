@@ -77,6 +77,7 @@ func main() {
 
 	_, err := run(appContext, os.Args, runner)
 	if err != nil {
+		//nolint:forbidigo
 		fmt.Printf("run error: %s\n", err)
 		os.Exit(1)
 	}

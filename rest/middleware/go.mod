@@ -3,23 +3,23 @@ module github.com/go-orb/examples/rest/middleware
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.2.2-0.20250307141103-038ba03c3f37
+	github.com/go-orb/go-orb v0.2.2-0.20250307213241-c0f330c4e8b5
 	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307143039-087f14085771
-	github.com/go-orb/plugins/cli/urfave v0.0.0-20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/client/orb v0.1.4-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/client/orb_transport/drpc v0.0.0-20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/log/lumberjack v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/registry/consul v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/server/drpc v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250307142109-89a0ed05b479
-	github.com/go-orb/plugins/server/http v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/cli/urfave v0.0.0-20250307213404-581f83efe070
+	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/client/orb v0.1.4-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/client/orb_transport/drpc v0.0.0-20250307213404-581f83efe070
+	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250307213404-581f83efe070
+	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/log/lumberjack v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/registry/consul v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/server/drpc v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/plugins/server/http v0.1.1-0.20250307213404-581f83efe070
 	github.com/go-orb/wire v0.7.0
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
@@ -32,7 +32,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.1 // indirect
-	github.com/go-orb/plugins/registry/regutil v0.1.1-0.20250307142109-89a0ed05b479 // indirect
+	github.com/go-orb/plugins/registry/regutil v0.1.1-0.20250307213404-581f83efe070 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/pprof v0.0.0-20250302191652-9094ed2288e7 // indirect
 	github.com/google/uuid v1.6.0 // indirect

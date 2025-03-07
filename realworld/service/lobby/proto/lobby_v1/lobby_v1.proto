@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package lobby.v1;
+
+option go_package = "./lobby;lobby_v1";
+
+import "google/protobuf/empty.proto";
+
+service LobbyService {
+    rpc ListGames(google.protobuf.Empty) returns (ListGamesResponse);
+}
+
+message ListGamesResponse {
+    repeated Game games = 1;
+}
+
+message Game {
+    string id = 1;
+    string name = 2;
+}

@@ -97,7 +97,8 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 	hRegister := echo2.RegisterEchoHandler(hInstance)
 
 	opts := []server.ConfigOption{}
-	opts = append(opts, server.WithEntrypointConfig(grpc.NewConfig(grpc.WithName("grpc"), grpc.WithInsecure(), grpc.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig(grpc.NewConfig(grpc.WithName("grpc"), grpc.WithInsecure(), grpc.WithHandlers(hRegister), grpc.WithReflection(true))))
+	opts = append(opts, server.WithEntrypointConfig(grpc.NewConfig(grpc.WithName("grpcs"), grpc.WithHandlers(hRegister), grpc.WithReflection(true))))
 	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("http"), http.WithInsecure(), http.WithHandlers(hRegister))))
 	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("https"), http.WithDisableHTTP2(), http.WithHandlers(hRegister))))
 	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("h2c"), http.WithInsecure(), http.WithAllowH2C(), http.WithHandlers(hRegister))))

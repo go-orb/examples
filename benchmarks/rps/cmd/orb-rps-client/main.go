@@ -223,6 +223,7 @@ func bench(
 
 	// Wait for the warmup
 	<-wCtx.Done()
+	wg.Wait()
 
 	//
 	// Bench

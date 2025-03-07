@@ -26,6 +26,14 @@ A example on howto run multiple services in a monolith.
 
 A simple example of RPC requests over the event plugins, currently theres only the natsjs backend.
 
+### [realworld](realworld)
+
+An advanced example which shows howto build a multi-service app that is also able to run as monolith.
+
+This example uses [httpgateway](https://github.com/go-orb/httpgateway) to forward requests.
+
+It is the latest and greatest example and we will work on extending it.
+
 ### [rest/auth](rest/auth)
 
 A simple example of a go-orb service and client with an auth REST API.

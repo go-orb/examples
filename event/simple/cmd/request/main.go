@@ -17,7 +17,7 @@ import (
 )
 
 func runner(
-	ctx context.Context,
+	_ context.Context,
 	logger log.Logger,
 	eventHandler event.Handler,
 ) error {
@@ -56,6 +56,7 @@ func main() {
 
 	_, err := run(appContext, os.Args, runner)
 	if err != nil {
+		//nolint:forbidigo
 		fmt.Printf("run error: %s\n", err)
 		os.Exit(1)
 	}

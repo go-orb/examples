@@ -37,6 +37,12 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 		mgrpc.WithName("grpc"),
 		mgrpc.WithInsecure(),
 		mgrpc.WithHandlers(hRegister),
+		mgrpc.WithReflection(true),
+	)))
+	opts = append(opts, server.WithEntrypointConfig(mgrpc.NewConfig(
+		mgrpc.WithName("grpcs"),
+		mgrpc.WithHandlers(hRegister),
+		mgrpc.WithReflection(true),
 	)))
 	opts = append(opts, server.WithEntrypointConfig(mhttp.NewConfig(
 		mhttp.WithName("http"),

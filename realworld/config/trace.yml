@@ -1,0 +1,15 @@
+realworld:
+  logger:
+    level: TRACE
+  service:
+    httpgateway:
+      logger:
+        level: TRACE
+      registry:
+        plugin: memory
+    lobby:
+      logger:
+        level: TRACE
+      registry:
+        plugin: memory
+        
