@@ -8,16 +8,16 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/signal"
 	"runtime"
 	"sync"
-	"syscall"
 	"time"
 
 	// go-orb.
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
+	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/types"
 
 	// Own imports.
@@ -27,7 +27,6 @@ import (
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/codecs/yaml"
-	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
 
@@ -35,12 +34,12 @@ import (
 	_ "github.com/go-orb/plugins/registry/consul"
 
 	// All transports.
-	_ "github.com/go-orb/plugins/client/orb/transport/drpc"
-	_ "github.com/go-orb/plugins/client/orb/transport/grpc"
-	_ "github.com/go-orb/plugins/client/orb/transport/h2c"
-	_ "github.com/go-orb/plugins/client/orb/transport/http"
-	_ "github.com/go-orb/plugins/client/orb/transport/http3"
-	_ "github.com/go-orb/plugins/client/orb/transport/https"
+	_ "github.com/go-orb/plugins/client/orb_transport/drpc"
+	_ "github.com/go-orb/plugins/client/orb_transport/grpc"
+	_ "github.com/go-orb/plugins/client/orb_transport/h2c"
+	_ "github.com/go-orb/plugins/client/orb_transport/http"
+	_ "github.com/go-orb/plugins/client/orb_transport/http3"
+	_ "github.com/go-orb/plugins/client/orb_transport/https"
 )
 
 const serverName = "benchmarks.rps.server"
@@ -118,6 +117,7 @@ func connection(
 //
 //nolint:funlen
 func bench(
+	ctx context.Context,
 	sn types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
@@ -164,17 +164,13 @@ func bench(
 		return err
 	}
 
-	wCtx, wCancel := context.WithCancel(context.Background())
-
 	// Cache URL
 	if cfg.BypassRegistry == 1 {
 		logger.Debug("Resolving", "server", serverName)
 
-		nodes, err := cli.ResolveService(wCtx, serverName, cfg.Transport)
+		nodes, err := cli.ResolveService(ctx, serverName, cfg.Transport)
 		if err != nil {
 			logger.Error("Failed to resolve service, did you start the server?", "error", err, "server", serverName)
-			wCancel()
-
 			return err
 		}
 
@@ -185,11 +181,9 @@ func bench(
 			preferredTransports = cli.Config().PreferredTransports
 		}
 
-		node, err := cli.Config().Selector(wCtx, serverName, nodes, preferredTransports, false)
+		node, err := cli.Config().Selector(ctx, serverName, nodes, preferredTransports, false)
 		if err != nil {
 			logger.Error("Failed to resolve service, did you start the server?", "error", err, "server", serverName)
-			wCancel()
-
 			return err
 		}
 
@@ -202,25 +196,19 @@ func bench(
 	msg := make([]byte, cfg.PackageSize)
 	if _, err := rand.Reader.Read(msg); err != nil {
 		logger.Error("Failed to make a request", "error", err)
-		wCancel()
-
 		return err
 	}
 
 	var wg sync.WaitGroup
 
-	quit := make(chan os.Signal, 1)
-	done := make(chan os.Signal, 1)
-
-	// End requests on SIGINT/SIGTERM.
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
 	//
 	// Warmup
 	//
 
-	timer := time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {
-		done <- syscall.SIGINT
+	wCtx, wCancel := context.WithCancel(ctx)
+
+	time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {
+		wCancel()
 	})
 
 	logger.Info("Warming up...")
@@ -233,26 +221,19 @@ func bench(
 		go connection(wCtx, &wg, cli, logger, msg, opts, i, nullChan)
 	}
 
-	select {
-	case <-done:
-		wCancel()
-		timer.Stop()
-	case <-quit:
-		wCancel()
-		timer.Stop()
-		os.Exit(1)
-	}
+	// Wait for the warmup
+	<-wCtx.Done()
 
 	//
 	// Bench
 	//
 	logger.Info("Now running the benchmark")
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ctx)
 
 	// Timer to end requests
-	timer = time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {
-		done <- syscall.SIGINT
+	time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {
+		cancel()
 	})
 
 	// Statistics channel
@@ -266,21 +247,12 @@ func bench(
 	}
 
 	// Blocks until timer/signal happened
-	select {
-	case <-done:
-		wCancel()
-		timer.Stop()
-		// stops requesting
-		cancel()
+	<-ctx.Done()
+	// stops requesting
+	cancel()
 
-		// Wait for all goroutines to exit properly.
-		wg.Wait()
-	case <-quit:
-		wCancel()
-		timer.Stop()
-		cancel()
-		os.Exit(0)
-	}
+	// Wait for all goroutines to exit properly.
+	wg.Wait()
 
 	// Calculate stats
 	mStats := stats{}
@@ -305,20 +277,40 @@ func bench(
 		"reqsError", mStats.Error,
 	)
 
-	wCancel()
-	cancel()
-
 	return nil
 }
 
 func main() {
-	var (
-		serviceName    = types.ServiceName("benchmarks.rps.client")
-		serviceVersion = types.ServiceVersion("v0.0.1")
-	)
+	app := cli.App{
+		Name:     "benchmarks.rps.client",
+		Version:  "",
+		Usage:    "A benchmarking client",
+		NoAction: false,
+		Flags: []*cli.Flag{
+			{
+				Name:        "registry",
+				Default:     registry.DefaultRegistry,
+				EnvVars:     []string{"REGISTRY"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"registry", "plugin"}}},
+				Usage:       "Set the registry plugin, one of mdns, consul, memory",
+			},
+			{
+				Name:        "log_level",
+				Default:     "INFO",
+				EnvVars:     []string{"LOG_LEVEL"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
+			},
+		},
+		Commands: []*cli.Command{},
+	}
+	app.Flags = append(app.Flags, flags()...)
 
-	if _, err := run(serviceName, serviceVersion, bench); err != nil {
-		log.Error("While running", "err", err)
+	appContext := cli.NewAppContext(&app)
+
+	_, err := run(appContext, os.Args, bench)
+	if err != nil {
+		fmt.Printf("run error: %s\n", err)
 		os.Exit(1)
 	}
 }

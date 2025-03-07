@@ -2,48 +2,39 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"os"
 
-	"github.com/go-orb/examples/event/simple/pb/user_new"
-	"github.com/go-orb/go-orb/event"
-	"github.com/go-orb/go-orb/log"
-	"github.com/go-orb/go-orb/types"
+	"github.com/go-orb/go-orb/cli"
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
-	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
-	"github.com/google/uuid"
 )
 
-func runner(
-	eventWire event.Handler,
-	done chan os.Signal,
-) error {
-	userNewHandler := func(_ context.Context, req *user_new.Request) (*user_new.Resp, error) {
-		return &user_new.Resp{Name: req.GetName(), Uuid: uuid.New().String()}, nil
+func main() {
+	app := cli.App{
+		Name:     "orb.examples.event.simple.handler",
+		Version:  "",
+		Usage:    "A foobar example app",
+		NoAction: false,
+		Flags: []*cli.Flag{
+			{
+				Name:        "log_level",
+				Default:     "INFO",
+				EnvVars:     []string{"LOG_LEVEL"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
+			},
+		},
+		Commands: []*cli.Command{},
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	appContext := cli.NewAppContext(&app)
 
-	event.HandleRequest(ctx, eventWire, "user.new", userNewHandler)
-
-	// Blocks until sigterm/sigkill.
-	<-done
-
-	cancel()
-
-	return nil
-}
-
-func main() {
-	var (
-		serviceName    = types.ServiceName("orb.examples.event.simple")
-		serviceVersion = types.ServiceVersion("v0.0.1")
-	)
-
-	if _, err := run(serviceName, serviceVersion, runner); err != nil {
-		log.Error("while running", "err", err)
+	_, err := run(appContext, os.Args)
+	if err != nil {
+		fmt.Printf("run error: %s\n", err)
+		os.Exit(1)
 	}
 }

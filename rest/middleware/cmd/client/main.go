@@ -4,11 +4,13 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"slices"
 
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
-	"github.com/go-orb/go-orb/types"
 
 	// Own imports.
 	echoproto "github.com/go-orb/examples/rest/middleware/proto/echo"
@@ -16,7 +18,6 @@ import (
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/codecs/yaml"
-	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
 
@@ -25,11 +26,12 @@ import (
 
 	_ "github.com/go-orb/plugins/client/middleware/log"
 	_ "github.com/go-orb/plugins/client/orb"
-	_ "github.com/go-orb/plugins/client/orb/transport/drpc"
-	_ "github.com/go-orb/plugins/client/orb/transport/grpc"
+	_ "github.com/go-orb/plugins/client/orb_transport/drpc"
+	_ "github.com/go-orb/plugins/client/orb_transport/grpc"
 )
 
 func runner(
+	ctx context.Context,
 	logger log.Logger,
 	clientWire client.Type,
 ) error {
@@ -38,7 +40,7 @@ func runner(
 
 	// Run the query.
 	protoClient := echoproto.NewEchoClient(clientWire)
-	resp, err := protoClient.Echo(context.Background(), "orb.examples.rest.middleware.server", req)
+	resp, err := protoClient.Echo(ctx, "orb.examples.rest.middleware.server", req)
 
 	if err != nil {
 		logger.Error("while requesting", "error", err)
@@ -54,12 +56,28 @@ func runner(
 }
 
 func main() {
-	var (
-		serviceName    = types.ServiceName("orb.examples.rest.middleware.client")
-		serviceVersion = types.ServiceVersion("v0.0.1")
-	)
+	app := cli.App{
+		Name:     "orb.examples.rest.middleware.client",
+		Version:  "",
+		Usage:    "A foobar example app",
+		NoAction: false,
+		Flags: []*cli.Flag{
+			{
+				Name:        "log_level",
+				Default:     "INFO",
+				EnvVars:     []string{"LOG_LEVEL"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
+			},
+		},
+		Commands: []*cli.Command{},
+	}
 
-	if _, err := run(serviceName, serviceVersion, runner); err != nil {
-		log.Error("while running", "err", err)
+	appContext := cli.NewAppContext(&app)
+
+	_, err := run(appContext, os.Args, runner)
+	if err != nil {
+		fmt.Printf("run error: %s\n", err)
+		os.Exit(1)
 	}
 }

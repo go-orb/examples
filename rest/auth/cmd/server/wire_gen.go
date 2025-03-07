@@ -13,9 +13,6 @@ import (
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 import (
@@ -28,7 +25,7 @@ import (
 // Injectors from wire.go:
 
 // run combines everything above and runs the callback.
-func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
+func run(ctx context.Context, serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
 	v, err := types.ProvideComponents()
 	if err != nil {
 		return "", err
@@ -59,7 +56,7 @@ func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb 
 	if err != nil {
 		return "", err
 	}
-	mainWireRunResult, err := wireRun(serviceName, serviceVersion, v, logger, mainServerConfigured, cb)
+	mainWireRunResult, err := wireRun(ctx, serviceName, serviceVersion, v, logger, mainServerConfigured, cb)
 	if err != nil {
 		return "", err
 	}
@@ -79,15 +76,16 @@ type wireRunResult string
 
 // wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
+	ctx context.Context,
 	serviceName types.ServiceName,
 	serviceVersion types.ServiceVersion,
 	logger log.Logger,
-	done chan os.Signal,
 ) error
 
 type serverConfigured struct{}
 
 func wireRun(
+	ctx context.Context,
 	serviceName types.ServiceName,
 	serviceVersion types.ServiceVersion,
 	components *types.Components,
@@ -97,19 +95,16 @@ func wireRun(
 ) (wireRunResult, error) {
 
 	for _, c := range components.Iterate(false) {
-		err := c.Start()
+		err := c.Start(ctx)
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 			return "", err
 		}
 	}
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+	runErr := cb(ctx, serviceName, serviceVersion, logger)
 
-	runErr := cb(serviceName, serviceVersion, logger, done)
-
-	ctx := context.Background()
+	ctx = context.Background()
 
 	for _, c := range components.Iterate(true) {
 		err := c.Stop(ctx)

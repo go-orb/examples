@@ -11,73 +11,77 @@ import (
 	"fmt"
 	"github.com/go-orb/examples/benchmarks/rps/handler/echo"
 	echo2 "github.com/go-orb/examples/benchmarks/rps/proto/echo"
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
-	"github.com/go-orb/plugins/config/source/cli/urfave"
+	"github.com/go-orb/plugins/cli/urfave"
 	"github.com/go-orb/plugins/server/drpc"
 	"github.com/go-orb/plugins/server/grpc"
 	"github.com/go-orb/plugins/server/http"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 import (
-	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
-	_ "github.com/go-orb/plugins/codecs/yaml"
-	_ "github.com/go-orb/plugins/config/source/cli/urfave"
-	_ "github.com/go-orb/plugins/config/source/file"
-	_ "github.com/go-orb/plugins/log/lumberjack"
+	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
-	_ "github.com/go-orb/plugins/registry/consul"
-	_ "github.com/go-orb/plugins/server/http/router/chi"
 )
 
 // Injectors from wire.go:
 
-// run combines everything above and runs the callback.
-func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
+func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
+	serviceContext, err := cli.ProvideSingleServiceContext(appContext)
+	if err != nil {
+		return wireRunResult{}, err
+	}
 	v, err := types.ProvideComponents()
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	configData, err := urfave.ProvideConfigData(serviceName, serviceVersion)
+	serviceName, err := cli.ProvideServiceName(serviceContext)
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	v2 := _wireValue
-	logger, err := log.Provide(serviceName, configData, v, v2...)
+	parserFunc, err := urfave.ProvideParser()
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	v3 := _wireValue2
-	registryType, err := registry.Provide(serviceName, serviceVersion, configData, v, logger, v3...)
+	v2, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	v4, err := provideServerOpts()
+	configData, err := cli.ProvideConfigData(serviceContext, v2)
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	serverServer, err := server.Provide(serviceName, configData, v, logger, registryType, v4...)
+	logger, err := log.ProvideNoOpts(serviceName, configData, v)
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceName, serviceVersion, v, logger, serverServer, cb)
+	serviceVersion, err := cli.ProvideServiceVersion(serviceContext)
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
+	}
+	registryType, err := registry.ProvideNoOpts(serviceName, serviceVersion, configData, v, logger)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	v3, err := provideServerOpts()
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	serverServer, err := server.Provide(serviceName, configData, v, logger, registryType, v3...)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	mainWireRunResult, err := wireRun(serviceContext, v, logger, serverServer)
+	if err != nil {
+		return wireRunResult{}, err
 	}
 	return mainWireRunResult, nil
 }
-
-var (
-	_wireValue  = []log.Option{}
-	_wireValue2 = []registry.Option{}
-)
 
 // wire.go:
 
@@ -100,47 +104,37 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 }
 
 // wireRunResult is here so "wire" has a type for the return value of wireRun.
-// wire needs a explicit type for each provider including "wireRun".
-type wireRunResult string
-
-// wireRunCallback is the actual code that runs the business logic.
-type wireRunCallback func(
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
-	logger log.Logger,
-	done chan os.Signal,
-) error
+type wireRunResult struct{}
 
 func wireRun(
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
+	serviceContext *cli.ServiceContext,
 	components *types.Components,
 	logger log.Logger,
 	_ server.Server,
-	cb wireRunCallback,
 ) (wireRunResult, error) {
 
 	for _, c := range components.Iterate(false) {
-		err := c.Start()
+		logger.Debug("Starting", "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+
+		err := c.Start(serviceContext.Context())
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
-			return "", err
+			return wireRunResult{}, fmt.Errorf("failed to start component %s/%s: %w", c.Type(), c.String(), err)
 		}
 	}
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
-
-	runErr := cb(serviceName, serviceVersion, logger, done)
+	<-serviceContext.Context().Done()
 
 	ctx := context.Background()
 
 	for _, c := range components.Iterate(true) {
+		logger.Debug("Stopping", "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+
 		err := c.Stop(ctx)
 		if err != nil {
 			logger.Error("Failed to stop", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 		}
 	}
 
-	return "", runErr
+	return wireRunResult{}, nil
 }

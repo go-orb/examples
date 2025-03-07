@@ -18,6 +18,10 @@ The rps benchmark sends X bytes (default `1000`) to server which echoes it to th
 
 See the [WIKI](https://github.com/go-orb/go-orb/wiki/RPC-Benchmarks) for results.
 
+### [cmd/foobar](cmd/foobar)
+
+A example on howto run multiple services in a monolith.
+
 ### [event/simple](event/simple)
 
 A simple example of RPC requests over the event plugins, currently theres only the natsjs backend.
@@ -26,13 +30,25 @@ A simple example of RPC requests over the event plugins, currently theres only t
 
 A simple example of a go-orb service and client with an auth REST API.
 
-This example doesn't utilize the go-orb config system, just to show it's possible to configure a go-orb service without it.
+This example doesn't utilize the go-orb config system, just to show it's possible to configure a go-orb service without it. It has the smallest binary size of all examples.
 
 ### [rest/middleware](rest/middleware)
 
 A simple example of a go-orb service and client with a REST middleware.
 
 In it's [config](rest/middleware/config) folder you can find a variaty of config files for different transports as well as logging options and registries. All of them run with the same code/binary.
+
+Run the server with:
+
+```bash
+go run ./cmd/server/... --config ./config/grpc.yaml
+```
+
+And the client with:
+
+```bash
+go run ./cmd/client/... --config ./config/grpc.yaml
+```
 
 ## Running
 

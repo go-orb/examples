@@ -3,15 +3,15 @@ module github.com/go-orb/examples/rest/auth
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.1.1
-	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250224045217-34f042e80ea5
-	github.com/go-orb/plugins/client/middleware/log v0.1.0
-	github.com/go-orb/plugins/client/orb v0.1.3
-	github.com/go-orb/plugins/client/orb/transport/drpc v0.1.0
-	github.com/go-orb/plugins/codecs/json v0.1.0
-	github.com/go-orb/plugins/codecs/proto v0.1.0
-	github.com/go-orb/plugins/log/slog v0.1.0
-	github.com/go-orb/plugins/server/drpc v0.1.0
+	github.com/go-orb/go-orb v0.2.2-0.20250307104133-5994b6de19a3
+	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307101910-8f66e8ea2671
+	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250307115918-0861f248dff7
+	github.com/go-orb/plugins/client/orb v0.1.4-0.20250307115918-0861f248dff7
+	github.com/go-orb/plugins/client/orb_transport/drpc v0.0.0-20250307115918-0861f248dff7
+	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250307115918-0861f248dff7
+	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250307115918-0861f248dff7
+	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307115918-0861f248dff7
+	github.com/go-orb/plugins/server/drpc v0.1.1-0.20250307115918-0861f248dff7
 	github.com/go-orb/wire v0.7.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	google.golang.org/protobuf v1.36.5
@@ -25,9 +25,9 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/miekg/dns v1.1.63 // indirect
 	github.com/zeebo/errs v1.4.0 // indirect
-	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/tools v0.30.0 // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/tools v0.31.0 // indirect
 )

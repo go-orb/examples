@@ -9,102 +9,102 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-orb/examples/benchmarks/event/pb/echo"
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
-	"github.com/go-orb/plugins/config/source/cli/urfave"
-	"os"
-	"os/signal"
-	"syscall"
+	"github.com/go-orb/plugins/cli/urfave"
 )
 
 import (
-	_ "github.com/go-orb/plugins/codecs/goccyjson"
+	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
-	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
 )
 
 // Injectors from wire.go:
 
-// run combines everything above and
-func run(serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
+func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
+	serviceContext, err := cli.ProvideSingleServiceContext(appContext)
+	if err != nil {
+		return wireRunResult{}, err
+	}
 	v, err := types.ProvideComponents()
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	configData, err := urfave.ProvideConfigData(serviceName, serviceVersion)
+	serviceName, err := cli.ProvideServiceName(serviceContext)
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	v2 := _wireValue
-	logger, err := log.Provide(serviceName, configData, v, v2...)
+	parserFunc, err := urfave.ProvideParser()
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	v3 := _wireValue2
-	handler, err := event.Provide(serviceName, configData, v, logger, v3...)
+	v2, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceName, serviceVersion, v, logger, handler, cb)
+	configData, err := cli.ProvideConfigData(serviceContext, v2)
 	if err != nil {
-		return "", err
+		return wireRunResult{}, err
+	}
+	logger, err := log.ProvideNoOpts(serviceName, configData, v)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	handler, err := event.ProvideNoOpts(serviceName, configData, v, logger)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	mainWireRunResult, err := wireRun(serviceContext, v, logger, handler)
+	if err != nil {
+		return wireRunResult{}, err
 	}
 	return mainWireRunResult, nil
 }
 
-var (
-	_wireValue  = []log.Option{}
-	_wireValue2 = []event.Option{}
-)
-
 // wire.go:
 
 // wireRunResult is here so "wire" has a type for the return value of wireRun.
-// wire needs a explicit type for each provider including "wireRun".
-type wireRunResult string
-
-// wireRunCallback is the actual code that runs the business logic.
-type wireRunCallback func(
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
-	logger log.Logger, event2 event.Handler,
-
-	done chan os.Signal,
-) error
+type wireRunResult struct{}
 
 func wireRun(
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
+	serviceContext *cli.ServiceContext,
 	components *types.Components,
-	logger log.Logger, event2 event.Handler,
-
-	cb wireRunCallback,
+	logger log.Logger,
+	eventHandler event.Handler,
 ) (wireRunResult, error) {
 
 	for _, c := range components.Iterate(false) {
-		err := c.Start()
+		logger.Debug("Starting", "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+
+		err := c.Start(serviceContext.Context())
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
-			return "", err
+			return wireRunResult{}, fmt.Errorf("failed to start component %s/%s: %w", c.Type(), c.String(), err)
 		}
 	}
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+	echoHandler := func(_ context.Context, req *echo.Req) (*echo.Resp, error) {
+		return &echo.Resp{Payload: req.GetPayload()}, nil
+	}
+	event.HandleRequest(serviceContext.Context(), eventHandler, "echo.echo", echoHandler)
 
-	runErr := cb(serviceName, serviceVersion, logger, event2, done)
+	<-serviceContext.Context().Done()
 
 	ctx := context.Background()
 
 	for _, c := range components.Iterate(true) {
+		logger.Debug("Stopping", "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+
 		err := c.Stop(ctx)
 		if err != nil {
 			logger.Error("Failed to stop", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 		}
 	}
 
-	return "", runErr
+	return wireRunResult{}, nil
 }

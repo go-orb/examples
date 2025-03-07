@@ -6,9 +6,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
@@ -23,11 +20,13 @@ type wireRunResult string
 
 // wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
+	ctx context.Context,
 	logger log.Logger,
 	client client.Type,
 ) error
 
 func wireRun(
+	ctx context.Context,
 	logger log.Logger,
 	client client.Type,
 	components *types.Components,
@@ -35,22 +34,19 @@ func wireRun(
 ) (wireRunResult, error) {
 	// Orb start
 	for _, c := range components.Iterate(false) {
-		err := c.Start()
+		err := c.Start(ctx)
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 			return "", err
 		}
 	}
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
-
 	//
 	// Actual code
-	runErr := cb(logger, client)
+	runErr := cb(ctx, logger, client)
 
 	// Orb shutdown.
-	ctx := context.Background()
+	ctx = context.Background()
 
 	for _, c := range components.Iterate(true) {
 		err := c.Stop(ctx)
@@ -64,6 +60,7 @@ func wireRun(
 
 // run combines everything above and
 func run(
+	ctx context.Context,
 	serviceName types.ServiceName,
 	serviceVersion types.ServiceVersion,
 	cb wireRunCallback,
@@ -73,8 +70,7 @@ func run(
 		wire.Value(types.ConfigData{}),
 		provideLoggerOpts,
 		log.Provide,
-		wire.Value([]registry.Option{}),
-		registry.Provide,
+		registry.ProvideNoOpts,
 		provideClientOpts,
 		client.Provide,
 		wireRun,

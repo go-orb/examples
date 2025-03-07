@@ -1,10 +1,9 @@
 package main
 
 import (
-	"errors"
 	"runtime"
 
-	"github.com/go-orb/go-orb/config/source/cli"
+	"github.com/go-orb/go-orb/cli"
 )
 
 const (
@@ -24,99 +23,74 @@ var (
 	defaultThreads = runtime.NumCPU()
 )
 
-func init() {
-	err := cli.Flags.Add(cli.NewFlag(
+func flags() []*cli.Flag {
+	var flags []*cli.Flag
+
+	flags = append(flags, cli.NewFlag(
 		"bypass_registry",
 		defaultBypassRegistry,
-		cli.ConfigPathSlice([]string{configSection, "bypassRegistry"}),
-		cli.Usage("Bypasses the registry by caching it, set to 0 to disable"),
-		cli.EnvVars("BYPASS_REGISTRY"),
+		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "bypassRegistry"}}),
+		cli.FlagUsage("Bypasses the registry by caching it, set to 0 to disable"),
+		cli.FlagEnvVars("BYPASS_REGISTRY"),
 	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
 
-	err = cli.Flags.Add(cli.NewFlag(
+	flags = append(flags, cli.NewFlag(
 		"connections",
 		defaultConnections,
-		cli.ConfigPathSlice([]string{configSection, "connections"}),
-		cli.Usage("Connections to keep open"),
-		cli.EnvVars("CONNECTIONS"),
+		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "connections"}}),
+		cli.FlagUsage("Connections to keep open"),
+		cli.FlagEnvVars("CONNECTIONS"),
 	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
 
-	err = cli.Flags.Add(cli.NewFlag(
+	flags = append(flags, cli.NewFlag(
 		"duration",
 		defaultDuration,
-		cli.ConfigPathSlice([]string{configSection, "duration"}),
-		cli.Usage("Duration in seconds"),
-		cli.EnvVars("DURATION"),
+		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "duration"}}),
+		cli.FlagUsage("Duration in seconds"),
+		cli.FlagEnvVars("DURATION"),
 	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
 
-	err = cli.Flags.Add(cli.NewFlag(
+	flags = append(flags, cli.NewFlag(
 		"timeout",
 		defaultTimeout,
-		cli.ConfigPathSlice([]string{configSection, "timeout"}),
-		cli.Usage("Timeout in seconds"),
-		cli.EnvVars("TIMEOUT"),
+		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "timeout"}}),
+		cli.FlagUsage("Timeout in seconds"),
+		cli.FlagEnvVars("TIMEOUT"),
 	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
 
-	// function init is to long.....
-	init2()
-}
-
-func init2() {
-	err := cli.Flags.Add(cli.NewFlag(
+	flags = append(flags, cli.NewFlag(
 		"threads",
 		defaultThreads,
-		cli.ConfigPathSlice([]string{configSection, "threads"}),
-		cli.Usage("Number of threads to use = runtime.GOMAXPROCS()"),
-		cli.EnvVars("THREADS"),
+		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "threads"}}),
+		cli.FlagUsage("Number of threads to use = runtime.GOMAXPROCS()"),
+		cli.FlagEnvVars("THREADS"),
 	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
 
-	err = cli.Flags.Add(cli.NewFlag(
+	flags = append(flags, cli.NewFlag(
 		"transport",
 		defaultTransport,
-		cli.ConfigPathSlice([]string{configSection, "transport"}),
-		cli.Usage("Transport to use (grpc, drpc, http, uvm.)"),
-		cli.EnvVars("TRANSPORT"),
+		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "transport"}}),
+		cli.FlagUsage("Transport to use (grpc, drpc, http, uvm.)"),
+		cli.FlagEnvVars("TRANSPORT"),
 	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
 
-	err = cli.Flags.Add(cli.NewFlag(
+	flags = append(flags, cli.NewFlag(
 		"package_size",
 		defaultPackageSize,
-		cli.ConfigPathSlice([]string{configSection, "packageSize"}),
-		cli.Usage("Per request package size"),
-		cli.EnvVars("PACKAGE_SIZE"),
+		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "packageSize"}}),
+		cli.FlagUsage("Per request package size"),
+		cli.FlagEnvVars("PACKAGE_SIZE"),
 	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
 
-	err = cli.Flags.Add(cli.NewFlag(
+	flags = append(flags, cli.NewFlag(
 		"content_type",
 		defaultContentType,
-		cli.ConfigPathSlice([]string{configSection, "contentType"}),
-		cli.Usage("Content-Type (application/x-protobuf, application/x-protobuf+json)"),
-		cli.EnvVars("CONTENT_TYPE"),
+		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "contentType"}}),
+		cli.FlagUsage("Content-Type (application/x-protobuf, application/x-protobuf+json)"),
+		cli.FlagEnvVars("CONTENT_TYPE"),
 	))
-	if err != nil && !errors.Is(err, cli.ErrFlagExists) {
-		panic(err)
-	}
+
+	return flags
 }
 
 type clientConfig struct {

@@ -6,20 +6,20 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"os"
 	"runtime"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/go-orb/examples/benchmarks/event/pb/echo"
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
 	_ "github.com/go-orb/plugins/codecs/proto"
-	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
 )
@@ -44,7 +44,7 @@ func connection(
 	)
 
 	eventHandler = eventHandler.Clone()
-	if err := eventHandler.Start(); err != nil {
+	if err := eventHandler.Start(ctx); err != nil {
 		logger.Error("Failed to start", "err", err)
 		return
 	}
@@ -66,7 +66,7 @@ func connection(
 		}
 
 		// Run the query.
-		resp, err := event.Request[echo.Resp](context.Background(), eventHandler, "echo.echo", req)
+		resp, err := event.Request[echo.Resp](ctx, eventHandler, "echo.echo", req)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				continue
@@ -96,11 +96,11 @@ func connection(
 //
 //nolint:funlen
 func bench(
+	ctx context.Context,
 	sn types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
 	eventHandler event.Handler,
-	done chan os.Signal,
 ) error {
 	cfg := &clientConfig{
 		Connections: defaultConnections,
@@ -126,7 +126,7 @@ func bench(
 
 	runtime.GOMAXPROCS(cfg.Threads)
 
-	wCtx, wCancel := context.WithCancel(context.Background())
+	wCtx, wCancel := context.WithCancel(ctx)
 
 	// Create random bytes to ping-pong on each request.
 	msg := make([]byte, cfg.PackageSize)
@@ -139,14 +139,12 @@ func bench(
 
 	var wg sync.WaitGroup
 
-	quit := make(chan os.Signal, 1)
-
 	//
 	// Warmup
 	//
 
-	timer := time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {
-		done <- syscall.SIGINT
+	time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {
+		wCancel()
 	})
 
 	logger.Info("Warming up...")
@@ -163,26 +161,19 @@ func bench(
 		go connection(wCtx, &wg, eventHandler, logger, req, i, nullChan)
 	}
 
-	select {
-	case <-done:
-		wCancel()
-		timer.Stop()
-	case <-quit:
-		wCancel()
-		timer.Stop()
-		os.Exit(1)
-	}
+	// Wait for the warmup
+	<-wCtx.Done()
 
 	//
 	// Bench
 	//
 	logger.Info("Now running the benchmark")
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ctx)
 
 	// Timer to end requests
-	timer = time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {
-		done <- syscall.SIGINT
+	time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {
+		cancel()
 	})
 
 	// Statistics channel
@@ -196,19 +187,13 @@ func bench(
 	}
 
 	// Blocks until timer/signal happened
-	select {
-	case <-done:
-		timer.Stop()
-		// stops requesting
-		cancel()
+	<-ctx.Done()
 
-		// Wait for all goroutines to exit properly.
-		wg.Wait()
-	case <-quit:
-		timer.Stop()
-		cancel()
-		os.Exit(0)
-	}
+	// stops requesting
+	cancel()
+
+	// Wait for all goroutines to exit properly.
+	wg.Wait()
 
 	// Calculate stats
 	mStats := stats{}
@@ -234,12 +219,29 @@ func bench(
 }
 
 func main() {
-	var (
-		serviceName    = types.ServiceName("orb.examples.event.bench_request")
-		serviceVersion = types.ServiceVersion("v0.0.1")
-	)
+	app := cli.App{
+		Name:     "orb.examples.event.bench_request",
+		Version:  "",
+		Usage:    "A benchmarking client",
+		NoAction: false,
+		Flags: []*cli.Flag{
+			{
+				Name:        "log_level",
+				Default:     "INFO",
+				EnvVars:     []string{"LOG_LEVEL"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
+			},
+		},
+		Commands: []*cli.Command{},
+	}
+	app.Flags = append(app.Flags, flags()...)
 
-	if _, err := run(serviceName, serviceVersion, bench); err != nil {
-		log.Error("while running", "err", err)
+	appContext := cli.NewAppContext(&app)
+
+	_, err := run(appContext, os.Args, bench)
+	if err != nil {
+		fmt.Printf("run error: %s\n", err)
+		os.Exit(1)
 	}
 }

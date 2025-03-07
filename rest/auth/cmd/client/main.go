@@ -4,6 +4,8 @@ package main
 import (
 	"context"
 	"errors"
+	"os/signal"
+	"syscall"
 
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
@@ -22,7 +24,7 @@ import (
 
 	_ "github.com/go-orb/plugins/client/middleware/log"
 	_ "github.com/go-orb/plugins/client/orb"
-	_ "github.com/go-orb/plugins/client/orb/transport/drpc"
+	_ "github.com/go-orb/plugins/client/orb_transport/drpc"
 )
 
 // provideLoggerOpts returns the logger options.
@@ -36,6 +38,7 @@ func provideClientOpts() ([]client.Option, error) {
 }
 
 func runner(
+	ctx context.Context,
 	logger log.Logger,
 	clientWire client.Type,
 ) error {
@@ -44,14 +47,14 @@ func runner(
 
 	// Run the query.
 	authClient := authv1proto.NewAuthClient(clientWire)
-	tokenResp, err := authClient.Login(context.Background(), "orb.examples.rest.auth.server", req)
+	tokenResp, err := authClient.Login(ctx, "orb.examples.rest.auth.server", req)
 
 	if err != nil {
 		logger.Error("while requesting", "error", err)
 		return err
 	}
 
-	ctx, md := metadata.WithOutgoing(context.Background())
+	ctx, md := metadata.WithOutgoing(ctx)
 	md["authorization"] = "Bearer " + tokenResp.GetToken()
 
 	introspectResponse, err := authClient.Introspect(ctx, "orb.examples.rest.auth.server", &emptypb.Empty{})
@@ -76,7 +79,10 @@ func main() {
 		serviceVersion = types.ServiceVersion("v0.0.1")
 	)
 
-	if _, err := run(serviceName, serviceVersion, runner); err != nil {
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	if _, err := run(ctx, serviceName, serviceVersion, runner); err != nil {
 		log.Error("while running", "err", err)
 	}
 }

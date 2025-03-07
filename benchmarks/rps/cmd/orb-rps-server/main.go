@@ -1,17 +1,17 @@
-// Package main contains a server for running tests on.
+// Package main contains a simple handler/server example for a event run.
 package main
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/go-orb/go-orb/log"
-	"github.com/go-orb/go-orb/types"
+	"github.com/go-orb/go-orb/cli"
+	"github.com/go-orb/go-orb/registry"
 
 	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/codecs/yaml"
-	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/lumberjack"
 	_ "github.com/go-orb/plugins/log/slog"
@@ -19,29 +19,36 @@ import (
 	_ "github.com/go-orb/plugins/server/http/router/chi"
 )
 
-func runner(
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
-	logger log.Logger,
-	done chan os.Signal,
-) error {
-	logger.Info("Started", "name", serviceName, "version", serviceVersion)
-
-	// Blocks until the process receives a signal.
-	<-done
-
-	logger.Info("Stopping", "name", serviceName, "version", serviceVersion)
-
-	return nil
-}
-
 func main() {
-	var (
-		serviceName    = types.ServiceName("benchmarks.rps.server")
-		serviceVersion = types.ServiceVersion("v0.0.1")
-	)
+	app := cli.App{
+		Name:     "benchmarks.rps.server",
+		Version:  "",
+		Usage:    "A rps benchmarking server",
+		NoAction: false,
+		Flags: []*cli.Flag{
+			{
+				Name:        "registry",
+				Default:     registry.DefaultRegistry,
+				EnvVars:     []string{"REGISTRY"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"registry", "plugin"}}},
+				Usage:       "Set the registry plugin, one of mdns, consul, memory",
+			},
+			{
+				Name:        "log_level",
+				Default:     "INFO",
+				EnvVars:     []string{"LOG_LEVEL"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
+			},
+		},
+		Commands: []*cli.Command{},
+	}
 
-	if _, err := run(serviceName, serviceVersion, runner); err != nil {
-		log.Error("while running", "err", err)
+	appContext := cli.NewAppContext(&app)
+
+	_, err := run(appContext, os.Args)
+	if err != nil {
+		fmt.Printf("run error: %s\n", err)
+		os.Exit(1)
 	}
 }

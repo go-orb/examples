@@ -7,99 +7,87 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/url"
-	"os"
-	"os/signal"
-	"syscall"
 
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
-	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/types"
-	"github.com/go-orb/plugins/config/source/cli/urfave"
+	"github.com/go-orb/plugins/cli/urfave"
 
 	"github.com/go-orb/wire"
 )
 
-// provideConfigData reads the config from cli and returns it.
-func provideConfigData(
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
-) (types.ConfigData, error) {
-	u, err := url.Parse("cli://urfave")
-	if err != nil {
-		return nil, err
-	}
-
-	cfgSections := types.SplitServiceName(serviceName)
-
-	data, err := config.Read([]*url.URL{u}, cfgSections)
-
-	return data, err
-}
-
-type wireRunResult string
-
 type wireRunCallback func(
+	ctx context.Context,
 	serviceName types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
 	cli client.Type,
 ) error
 
+// wireRunResult is here so "wire" has a type for the return value of wireRun.
+type wireRunResult struct{}
+
 func wireRun(
+	serviceContext *cli.ServiceContext,
+	components *types.Components,
 	serviceName types.ServiceName,
 	configs types.ConfigData,
-	components *types.Components,
 	logger log.Logger,
-	cli client.Type,
+	clientWire client.Type,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	// Orb start
 	for _, c := range components.Iterate(false) {
-		err := c.Start()
+		logger.Debug("Starting", "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+
+		err := c.Start(serviceContext.Context())
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
-			return "", err
+			return wireRunResult{}, fmt.Errorf("failed to start component %s/%s: %w", c.Type(), c.String(), err)
 		}
 	}
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
-
-	//
 	// Actual code
-	runErr := cb(serviceName, configs, logger, cli)
+	runErr := cb(serviceContext.Context(), serviceName, configs, logger, clientWire)
 
 	// Orb shutdown.
 	ctx := context.Background()
 
 	for _, c := range components.Iterate(true) {
+		logger.Debug("Stopping", "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
+
 		err := c.Stop(ctx)
 		if err != nil {
 			logger.Error("Failed to stop", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 		}
 	}
 
-	return "", runErr
+	return wireRunResult{}, runErr
 }
 
-// newComponents combines everything above and returns a slice of components.
 func run(
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
+	appContext *cli.AppContext,
+	args []string,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	panic(wire.Build(
+		urfave.ProvideParser,
+		cli.ProvideParsedFlagsFromArgs,
+
+		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
-		urfave.ProvideConfigData,
-		wire.Value([]log.Option{}),
-		log.Provide,
-		wire.Value([]registry.Option{}),
-		registry.Provide,
-		wire.Value([]client.Option{}),
-		client.Provide,
+
+		cli.ProvideConfigData,
+		cli.ProvideServiceName,
+		cli.ProvideServiceVersion,
+
+		log.ProvideNoOpts,
+
+		registry.ProvideNoOpts,
+		client.ProvideNoOpts,
+
 		wireRun,
 	))
 }

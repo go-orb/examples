@@ -2,7 +2,9 @@
 package main
 
 import (
-	"os"
+	"context"
+	"os/signal"
+	"syscall"
 
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/server"
@@ -56,15 +58,16 @@ func provideServerConfigured(logger log.Logger, srv server.Server) (serverConfig
 	return serverConfigured{}, nil
 }
 
-func runner(serviceName types.ServiceName,
+func runner(
+	ctx context.Context,
+	serviceName types.ServiceName,
 	serviceVersion types.ServiceVersion,
 	logger log.Logger,
-	done chan os.Signal,
 ) error {
 	logger.Info("Started", "name", serviceName, "version", serviceVersion)
 
 	// Blocks until the process receives a signal.
-	<-done
+	<-ctx.Done()
 
 	logger.Info("Stopping", "name", serviceName, "version", serviceVersion)
 
@@ -77,7 +80,10 @@ func main() {
 		serviceVersion = types.ServiceVersion("v0.0.1")
 	)
 
-	if _, err := run(serviceName, serviceVersion, runner); err != nil {
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	if _, err := run(ctx, serviceName, serviceVersion, runner); err != nil {
 		log.Error("while running", "err", err)
 	}
 }

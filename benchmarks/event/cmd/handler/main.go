@@ -1,55 +1,40 @@
-// Package main contains a handler which acts as server for the request client.
+// Package main contains a simple handler/server example for a event run.
 package main
 
 import (
-	"context"
+	"fmt"
 	"os"
 
-	"github.com/go-orb/examples/benchmarks/event/pb/echo"
-	"github.com/go-orb/go-orb/event"
-	"github.com/go-orb/go-orb/log"
-	"github.com/go-orb/go-orb/types"
-	_ "github.com/go-orb/plugins/codecs/goccyjson"
+	"github.com/go-orb/go-orb/cli"
+	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
-	_ "github.com/go-orb/plugins/config/source/cli/urfave"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
 )
 
-func runner(
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
-	logger log.Logger,
-	eventWire event.Handler,
-	done chan os.Signal,
-) error {
-	echoHandler := func(_ context.Context, req *echo.Req) (*echo.Resp, error) {
-		return &echo.Resp{Payload: req.GetPayload()}, nil
+func main() {
+	app := cli.App{
+		Name:     "benchmarks.event.handler",
+		Version:  "",
+		Usage:    "A event benchmarking handler",
+		NoAction: false,
+		Flags: []*cli.Flag{
+			{
+				Name:        "log_level",
+				Default:     "INFO",
+				EnvVars:     []string{"LOG_LEVEL"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
+			},
+		},
+		Commands: []*cli.Command{},
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	appContext := cli.NewAppContext(&app)
 
-	event.HandleRequest(ctx, eventWire, "echo.echo", echoHandler)
-
-	logger.Info("Started", "name", serviceName, "version", serviceVersion)
-
-	// Blocks until sigterm/sigkill.
-	<-done
-
-	logger.Info("Stopping", "name", serviceName, "version", serviceVersion)
-
-	cancel()
-
-	return nil
-}
-
-func main() {
-	var (
-		serviceName    = types.ServiceName("benchmarks.event.handler")
-		serviceVersion = types.ServiceVersion("v0.0.1")
-	)
-
-	if _, err := run(serviceName, serviceVersion, runner); err != nil {
-		log.Error("while running", "err", err)
+	_, err := run(appContext, os.Args)
+	if err != nil {
+		fmt.Printf("run error: %s\n", err)
+		os.Exit(1)
 	}
 }
