@@ -24,6 +24,7 @@ import (
 
 // HandlerEcho is the name of a service, it's here to static type/reference.
 const HandlerEcho = "echo.Echo"
+const EndpointEchoEcho = "/echo.Echo/Echo"
 
 // EchoClient is the client for echo.Echo
 type EchoClient struct {
@@ -35,9 +36,9 @@ func NewEchoClient(client client.Client) *EchoClient {
 	return &EchoClient{client: client}
 }
 
-// Echo calls Echo.
+// Echo requests Echo.
 func (c *EchoClient) Echo(ctx context.Context, service string, req *Req, opts ...client.CallOption) (*Resp, error) {
-	return client.Call[Resp](ctx, c.client, service, "echo.Echo/Echo", req, opts...)
+	return client.Request[Resp](ctx, c.client, service, EndpointEchoEcho, req, opts...)
 }
 
 // EchoHandler is the Handler for echo.Echo

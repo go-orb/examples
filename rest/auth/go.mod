@@ -3,15 +3,15 @@ module github.com/go-orb/examples/rest/auth
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.2.2-0.20250307104133-5994b6de19a3
-	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307101910-8f66e8ea2671
-	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/client/orb v0.1.4-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/client/orb_transport/drpc v0.0.0-20250307115918-0861f248dff7
-	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/server/drpc v0.1.1-0.20250307115918-0861f248dff7
+	github.com/go-orb/go-orb v0.2.2-0.20250307141103-038ba03c3f37
+	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307143039-087f14085771
+	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb v0.1.4-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb_transport/drpc v0.0.0-20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/server/drpc v0.1.1-0.20250307142109-89a0ed05b479
 	github.com/go-orb/wire v0.7.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	google.golang.org/protobuf v1.36.5

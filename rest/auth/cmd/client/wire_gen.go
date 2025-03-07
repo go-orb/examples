@@ -42,16 +42,15 @@ func run(ctx context.Context, serviceName types.ServiceName, serviceVersion type
 	if err != nil {
 		return "", err
 	}
-	v3 := _wireValue
-	registryType, err := registry.Provide(serviceName, serviceVersion, configData, v, logger, v3...)
+	registryType, err := registry.ProvideNoOpts(serviceName, serviceVersion, configData, v, logger)
 	if err != nil {
 		return "", err
 	}
-	v4, err := provideClientOpts()
+	v3, err := provideClientOpts()
 	if err != nil {
 		return "", err
 	}
-	clientType, err := client.Provide(serviceName, configData, v, logger, registryType, v4...)
+	clientType, err := client.Provide(serviceName, configData, v, logger, registryType, v3...)
 	if err != nil {
 		return "", err
 	}
@@ -64,7 +63,6 @@ func run(ctx context.Context, serviceName types.ServiceName, serviceVersion type
 
 var (
 	_wireConfigDataValue = types.ConfigData{}
-	_wireValue           = []registry.Option{}
 )
 
 // wire.go:

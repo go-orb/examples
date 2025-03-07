@@ -3,19 +3,26 @@ module github.com/go-orb/examples/benchmarks/rps
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.2.2-0.20250307104133-5994b6de19a3
-	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307101910-8f66e8ea2671
-	github.com/go-orb/plugins/client/orb v0.1.4-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/log/lumberjack v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/registry/consul v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/server/drpc v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250307115918-0861f248dff7
-	github.com/go-orb/plugins/server/http v0.1.1-0.20250307115918-0861f248dff7
+	github.com/go-orb/go-orb v0.2.2-0.20250307141103-038ba03c3f37
+	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307143039-087f14085771
+	github.com/go-orb/plugins/cli/urfave v0.0.0-20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb v0.1.4-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb_transport/drpc v0.0.0-20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb_transport/h2c v0.0.0-20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb_transport/http v0.0.0-20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb_transport/http3 v0.0.0-20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/client/orb_transport/https v0.0.0-20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/log/lumberjack v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/registry/consul v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/server/drpc v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250307142109-89a0ed05b479
+	github.com/go-orb/plugins/server/http v0.1.1-0.20250307142109-89a0ed05b479
 	github.com/go-orb/wire v0.7.0
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
@@ -28,10 +35,10 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.1 // indirect
-	github.com/go-orb/plugins/registry/regutil v0.1.1-0.20250307115918-0861f248dff7 // indirect
+	github.com/go-orb/plugins/client/orb_transport/basehttp v0.0.0-20250307142109-89a0ed05b479 // indirect
+	github.com/go-orb/plugins/registry/regutil v0.1.1-0.20250307142109-89a0ed05b479 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/pprof v0.0.0-20250302191652-9094ed2288e7 // indirect
-	github.com/google/subcommands v1.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/consul/api v1.31.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -51,12 +58,11 @@ require (
 	github.com/mitchellh/hashstructure v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/onsi/ginkgo/v2 v2.23.0 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.50.0 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/urfave/cli/v2 v2.27.5 // indirect
+	github.com/urfave/cli/v2 v2.27.6 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/zeebo/errs v1.4.0 // indirect
 	go.uber.org/mock v0.5.0 // indirect

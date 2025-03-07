@@ -24,6 +24,8 @@ import (
 
 // HandlerAuth is the name of a service, it's here to static type/reference.
 const HandlerAuth = "auth.v1.Auth"
+const EndpointAuthLogin = "/auth.v1.Auth/Login"
+const EndpointAuthIntrospect = "/auth.v1.Auth/Introspect"
 
 // AuthClient is the client for auth.v1.Auth
 type AuthClient struct {
@@ -35,14 +37,14 @@ func NewAuthClient(client client.Client) *AuthClient {
 	return &AuthClient{client: client}
 }
 
-// Login calls Login.
+// Login requests Login.
 func (c *AuthClient) Login(ctx context.Context, service string, req *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
-	return client.Call[LoginResponse](ctx, c.client, service, "auth.v1.Auth/Login", req, opts...)
+	return client.Request[LoginResponse](ctx, c.client, service, EndpointAuthLogin, req, opts...)
 }
 
-// Introspect calls Introspect.
+// Introspect requests Introspect.
 func (c *AuthClient) Introspect(ctx context.Context, service string, req *emptypb.Empty, opts ...client.CallOption) (*IntrospectResponse, error) {
-	return client.Call[IntrospectResponse](ctx, c.client, service, "auth.v1.Auth/Introspect", req, opts...)
+	return client.Request[IntrospectResponse](ctx, c.client, service, EndpointAuthIntrospect, req, opts...)
 }
 
 // AuthHandler is the Handler for auth.v1.Auth

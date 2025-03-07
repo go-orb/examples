@@ -80,11 +80,11 @@ func connection(
 		req := &echoproto.Req{Payload: msg}
 
 		// Run the query.
-		resp, err := client.Call[echoproto.Resp](
+		resp, err := client.Request[echoproto.Resp](
 			ctx,
 			cli,
 			serverName,
-			"echo.Echo/Echo",
+			echoproto.EndpointEchoEcho,
 			req,
 			opts...,
 		)
@@ -310,6 +310,7 @@ func main() {
 
 	_, err := run(appContext, os.Args, bench)
 	if err != nil {
+		//nolint:forbidigo
 		fmt.Printf("run error: %s\n", err)
 		os.Exit(1)
 	}
