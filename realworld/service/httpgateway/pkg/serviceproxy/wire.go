@@ -9,8 +9,8 @@ import (
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/wire"
 
-	httpgateway "github.com/go-orb/httpgateway"
-	httpgatewayservice "github.com/go-orb/httpgateway/pkg/service"
+	httpgateway "github.com/go-orb/service/httpgateway"
+	httpgatewayservice "github.com/go-orb/service/httpgateway/pkg/service"
 )
 
 // Name is the service name.

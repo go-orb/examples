@@ -11,7 +11,7 @@ import (
 
 	httpgatewayserviceproxy "github.com/go-orb/examples/realworld/service/httpgateway/pkg/serviceproxy"
 	lobbyservice "github.com/go-orb/examples/realworld/service/lobby/pkg/service"
-	httpgatewayservice "github.com/go-orb/httpgateway/pkg/service"
+	httpgatewayservice "github.com/go-orb/service/httpgateway/pkg/service"
 )
 
 // Runner is wire type for the Runner function.

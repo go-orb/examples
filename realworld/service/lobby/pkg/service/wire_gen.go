@@ -101,7 +101,7 @@ func provideActionServer(
 	_ server.Server, handler2 *handler.Handler,
 ) (ActionServer, error) {
 	return func() error {
-		if err := components.Add(handler2, types.PriorityServer-10); err != nil {
+		if err := components.Add(handler2, types.PriorityHandler); err != nil {
 			return err
 		}
 

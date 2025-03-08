@@ -9,8 +9,8 @@ package serviceproxy
 import (
 	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
-	service2 "github.com/go-orb/httpgateway"
-	"github.com/go-orb/httpgateway/pkg/service"
+	service2 "github.com/go-orb/service/httpgateway"
+	"github.com/go-orb/service/httpgateway/pkg/service"
 )
 
 // Injectors from wire.go:

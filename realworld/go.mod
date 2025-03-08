@@ -4,7 +4,6 @@ go 1.23.6
 
 require (
 	github.com/go-orb/go-orb v0.2.2-0.20250307215142-2a4889953172
-	github.com/go-orb/httpgateway v0.0.0-20250307214141-9a701b6f061f
 	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307143039-087f14085771
 	github.com/go-orb/plugins/cli/urfave v0.0.0-20250307213404-581f83efe070
 	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250307213404-581f83efe070
@@ -17,6 +16,7 @@ require (
 	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307213404-581f83efe070
 	github.com/go-orb/plugins/registry/memory v0.0.0-20250307213404-581f83efe070
 	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/service/httpgateway v0.0.0-20250308154101-ef3cf24db6e7
 	github.com/go-orb/wire v0.7.0
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5

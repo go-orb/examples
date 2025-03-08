@@ -26,8 +26,6 @@ github.com/go-logr/stdr v1.2.2 h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=
 github.com/go-logr/stdr v1.2.2/go.mod h1:mMo/vtBO5dYbehREoey6XUKy/eSumjCCveDpRre4VKE=
 github.com/go-orb/go-orb v0.2.2-0.20250307215142-2a4889953172 h1:pJqXzimN0rGQODGGbokxbTVm9eKY6DprXpGMd/FJRA4=
 github.com/go-orb/go-orb v0.2.2-0.20250307215142-2a4889953172/go.mod h1:TO/Gnyh+NGy5S5vZj9sYf+U9LSFhwUeAxdlxiPtj6PY=
-github.com/go-orb/httpgateway v0.0.0-20250307214141-9a701b6f061f h1:y4eNuD3NY5d4Ddr8QrDq4a1pGcCsnIBs2LIWMpbXEm8=
-github.com/go-orb/httpgateway v0.0.0-20250307214141-9a701b6f061f/go.mod h1:rm56DTYuZklRoynu38H1RtdNn946VElZEdjFx4Qn6xY=
 github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307143039-087f14085771 h1:k7uXmXjBp1OUS8X2Tozxk1uCHBhuTz8c954UrK+XWgw=
 github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307143039-087f14085771/go.mod h1:v5pn0+LTiXr6UU3taVC2YCiaqq/Y6tHkqI7xt/ITlps=
 github.com/go-orb/plugins/cli/urfave v0.0.0-20250307213404-581f83efe070 h1:CFJcYaOr+eJX4b9jDpRtmBO2PsUmRDVvZqh8FS7bV50=
@@ -56,6 +54,8 @@ github.com/go-orb/plugins/registry/tests v0.1.1-0.20250307141712-ef020f968e94 h1
 github.com/go-orb/plugins/registry/tests v0.1.1-0.20250307141712-ef020f968e94/go.mod h1:ynB9vBn3N+MrH0KhkW7mIp9khU/JT+bIlVJ5VpWhHRU=
 github.com/go-orb/plugins/server/grpc v0.1.1-0.20250307213404-581f83efe070 h1:D824ckLVnn+5WOAMmdzsAf/JXCPWxvhd6odOfM0o5rA=
 github.com/go-orb/plugins/server/grpc v0.1.1-0.20250307213404-581f83efe070/go.mod h1:3DcNKyqiQYa6WDT3dYkkAzS57YQnZQn8rdn1qxBpniQ=
+github.com/go-orb/service/httpgateway v0.0.0-20250308154101-ef3cf24db6e7 h1:SCKuz1Ys7bvTR9tqkM4vvZbhMoechG2ndCSID7+oh90=
+github.com/go-orb/service/httpgateway v0.0.0-20250308154101-ef3cf24db6e7/go.mod h1:vPKvOtrg9sEIxh6jhSuqh6K84Dsy44oU0oVBNACMyq8=
 github.com/go-orb/wire v0.7.0 h1:P9S100bM8nhAgW6e7EJrbi5vzNXCsP/Q1ByIEV5+hUQ=
 github.com/go-orb/wire v0.7.0/go.mod h1:/ID7hS6X2F32YnuRgh+k8R/sjucoh4qciqe7dq2dY7g=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=

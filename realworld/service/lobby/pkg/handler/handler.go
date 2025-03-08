@@ -10,10 +10,10 @@ import (
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/server"
 	"github.com/go-orb/go-orb/types"
-	httpgateway "github.com/go-orb/httpgateway"
+	httpgateway "github.com/go-orb/service/httpgateway"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/go-orb/httpgateway/proto/httpgateway_v1"
+	"github.com/go-orb/service/httpgateway/proto/httpgateway_v1"
 )
 
 var _ types.Component = (*Handler)(nil)

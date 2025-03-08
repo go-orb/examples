@@ -11,7 +11,7 @@ import (
 	"github.com/go-orb/examples/realworld/service/httpgateway/pkg/serviceproxy"
 	"github.com/go-orb/examples/realworld/service/lobby/pkg/service"
 	"github.com/go-orb/go-orb/cli"
-	service2 "github.com/go-orb/httpgateway/pkg/service"
+	service2 "github.com/go-orb/service/httpgateway/pkg/service"
 )
 
 // Injectors from wire.go:
