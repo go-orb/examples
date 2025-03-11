@@ -32,7 +32,7 @@ type stats struct {
 func connection(
 	ctx context.Context,
 	wg *sync.WaitGroup,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 	logger log.Logger,
 	req *echo.Req,
 	connectionNum int,
@@ -100,7 +100,7 @@ func bench(
 	sn types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 ) error {
 	cfg := &clientConfig{
 		Connections: defaultConnections,

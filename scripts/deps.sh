@@ -13,10 +13,6 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-function remove_prefix() {
-	echo "${1//\.\//}"
-}
-
 function get_last_tag() {
 	local pkg="$1"
 	local last_tag=$(git tag --list --sort='-creatordate' | grep -E "${pkg}/v[0-9\.]+" | head -n1)
@@ -107,28 +103,17 @@ function upgrade() {
 }
 
 function upgrade_all() {
-    for gomod in $(find . -name 'go.mod'); do
-		if [[ "${gomod}" == "./.github/go.mod" ]]; then
-			continue
-		fi
-	    upgrade "${gomod:0:-6}" "0"
-	done
+    find . -name 'go.mod' -print0 | xargs -0 -n 1 -P 0 ${SCRIPT_DIR}/deps.sh
 }
 
 function upgrade_specific() {
-	set +o noglob
 	while read -r pkg; do
-		# If path contains a star find all relevant packages
-		if echo "${pkg}" | grep -q "\*"; then
-			while read -r p; do
-				update_deps "$(remove_prefix "${p}")" "0"
-			done < <(find "${pkg}" -name 'go.mod' -printf "%h\n")
-		else
-			update_deps "${pkg}" "0"
+		if [[ "${pkg}" == "./.github/go.mod" ]]; then
+			continue
 		fi
+
+		update_deps "${pkg%go.mod}" "0"
 	done < <(echo "${1}" | tr "," "\n")
-	# set -o noglob
-	# set +o noglob
 }
 
 case $1 in

@@ -3,36 +3,36 @@ module github.com/go-orb/examples/realworld
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.2.2-0.20250307215142-2a4889953172
-	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250307143039-087f14085771
-	github.com/go-orb/plugins/cli/urfave v0.0.0-20250307213404-581f83efe070
-	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250307213404-581f83efe070
-	github.com/go-orb/plugins/client/orb v0.1.4-0.20250307213404-581f83efe070
-	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250307213404-581f83efe070
-	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250307213404-581f83efe070
-	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250307213404-581f83efe070
-	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250307213404-581f83efe070
-	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250307213404-581f83efe070
-	github.com/go-orb/plugins/log/slog v0.1.1-0.20250307213404-581f83efe070
-	github.com/go-orb/plugins/registry/memory v0.0.0-20250307213404-581f83efe070
-	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250307213404-581f83efe070
+	github.com/go-orb/go-orb v0.2.2-0.20250311013353-9996c5ae2659
+	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250310151257-e3753cc29dd6
+	github.com/go-orb/plugins/cli/urfave v0.0.0-20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/client/orb v0.1.4-0.20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/log/slog v0.1.1-0.20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/registry/memory v0.0.0-20250311025432-c3f6c11bc7a0
+	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250311025432-c3f6c11bc7a0
 	github.com/go-orb/service/httpgateway v0.0.0-20250308154101-ef3cf24db6e7
 	github.com/go-orb/wire v0.7.0
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
+	storj.io/drpc v0.0.34
 )
 
 require (
-	github.com/bytedance/sonic v1.11.9 // indirect
-	github.com/bytedance/sonic/loader v0.1.1 // indirect
-	github.com/cloudwego/base64x v0.1.4 // indirect
-	github.com/cloudwego/iasm v0.2.0 // indirect
+	github.com/bytedance/sonic v1.13.1 // indirect
+	github.com/bytedance/sonic/loader v0.2.4 // indirect
+	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/cornelk/hashmap v1.0.8 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.10.0 // indirect
-	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250307213404-581f83efe070 // indirect
+	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250311025432-c3f6c11bc7a0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.22.0 // indirect
@@ -41,7 +41,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/miekg/dns v1.1.63 // indirect
@@ -54,9 +54,10 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/urfave/cli/v2 v2.27.6 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
+	github.com/zeebo/errs v1.4.0 // indirect
 	go.opentelemetry.io/otel v1.34.0 // indirect
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
-	golang.org/x/arch v0.8.0 // indirect
+	golang.org/x/arch v0.15.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/net v0.37.0 // indirect

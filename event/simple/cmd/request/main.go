@@ -19,7 +19,7 @@ import (
 func runner(
 	_ context.Context,
 	logger log.Logger,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 ) error {
 	req := &user_new.Request{Name: "René"}
 

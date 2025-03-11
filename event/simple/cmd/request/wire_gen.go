@@ -54,11 +54,11 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	handler, err := event.ProvideNoOpts(serviceName, configData, v, logger)
+	eventType, err := event.ProvideNoOpts(serviceName, configData, v, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceContext, v, logger, handler, cb)
+	mainWireRunResult, err := wireRun(serviceContext, v, logger, eventType, cb)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -73,7 +73,7 @@ type wireRunResult struct{}
 // wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
 	ctx context.Context,
-	logger log.Logger, event2 event.Handler,
+	logger log.Logger, event2 event.Type,
 
 ) error
 
@@ -81,7 +81,7 @@ func wireRun(
 	serviceContext *cli.ServiceContext,
 	components *types.Components,
 	logger log.Logger,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 

@@ -18,6 +18,7 @@ import (
 	grpc "google.golang.org/grpc"
 
 	mdrpc "github.com/go-orb/plugins/server/drpc"
+	memory "github.com/go-orb/plugins/server/memory"
 
 	mhttp "github.com/go-orb/plugins/server/http"
 )
@@ -50,11 +51,24 @@ type EchoHandler interface {
 func registerEchoDRPCHandler(srv *mdrpc.Server, handler EchoHandler) error {
 	desc := DRPCEchoDescription{}
 
-	// Register with DRPC.
-	r := srv.Router()
+	// Register with the server/drpc(.Mux).
+	err := srv.Router().Register(handler, desc)
+	if err != nil {
+		return err
+	}
+
+	// Add each endpoint name of this handler to the orb drpc server.
+	srv.AddEndpoint("/echo.Echo/Echo")
+
+	return nil
+}
+
+// registerEchoMemoryHandler registers the service to an dRPC server.
+func registerEchoMemoryHandler(srv *memory.Server, handler EchoHandler) error {
+	desc := DRPCEchoDescription{}
 
 	// Register with the server/drpc(.Mux).
-	err := r.Register(handler, desc)
+	err := srv.Router().Register(handler, desc)
 	if err != nil {
 		return err
 	}
@@ -81,6 +95,8 @@ func RegisterEchoHandler(handler EchoHandler) server.RegistrationFunc {
 			registerEchoGRPCHandler(srv, handler)
 		case *mdrpc.Server:
 			registerEchoDRPCHandler(srv, handler)
+		case *memory.Server:
+			registerEchoMemoryHandler(srv, handler)
 		case *mhttp.Server:
 			registerEchoHTTPHandler(srv, handler)
 		default:

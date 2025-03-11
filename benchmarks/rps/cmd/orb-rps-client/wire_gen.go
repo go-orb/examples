@@ -11,10 +11,12 @@ import (
 	"fmt"
 	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
+	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/types"
 	"github.com/go-orb/plugins/cli/urfave"
+	"time"
 )
 
 import (
@@ -28,7 +30,6 @@ import (
 	_ "github.com/go-orb/plugins/client/orb_transport/https"
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
-	_ "github.com/go-orb/plugins/codecs/yaml"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
 	_ "github.com/go-orb/plugins/registry/consul"
@@ -61,6 +62,10 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
+	mainClientConfig, err := provideClientConfig(serviceName, configData)
+	if err != nil {
+		return wireRunResult{}, err
+	}
 	logger, err := log.ProvideNoOpts(serviceName, configData, v)
 	if err != nil {
 		return wireRunResult{}, err
@@ -73,11 +78,15 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	clientType, err := client.ProvideNoOpts(serviceName, configData, v, logger, registryType)
+	v3, err := provideClientOpts(mainClientConfig)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceContext, v, serviceName, configData, logger, clientType, cb)
+	clientType, err := client.Provide(serviceName, configData, v, logger, registryType, v3...)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	mainWireRunResult, err := wireRun(serviceContext, v, mainClientConfig, logger, clientType, cb)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -88,8 +97,7 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 
 type wireRunCallback func(
 	ctx context.Context,
-	serviceName types.ServiceName,
-	configs types.ConfigData,
+	cfg *clientConfig,
 	logger log.Logger, cli2 client.Type,
 
 ) error
@@ -100,8 +108,7 @@ type wireRunResult struct{}
 func wireRun(
 	serviceContext *cli.ServiceContext,
 	components *types.Components,
-	serviceName types.ServiceName,
-	configs types.ConfigData,
+	cfg *clientConfig,
 	logger log.Logger,
 	clientWire client.Type,
 	cb wireRunCallback,
@@ -117,7 +124,7 @@ func wireRun(
 		}
 	}
 
-	runErr := cb(serviceContext.Context(), serviceName, configs, logger, clientWire)
+	runErr := cb(serviceContext.Context(), cfg, logger, clientWire)
 
 	ctx := context.Background()
 
@@ -131,4 +138,29 @@ func wireRun(
 	}
 
 	return wireRunResult{}, runErr
+}
+
+func provideClientConfig(serviceName types.ServiceName, configs types.ConfigData) (*clientConfig, error) {
+	cfg := &clientConfig{
+		BypassRegistry: defaultBypassRegistry,
+		PoolSize:       defaultPoolSize,
+		Connections:    defaultConnections,
+		Duration:       defaultDuration,
+		Timeout:        defaultTimeout,
+		Threads:        defaultThreads,
+		Transport:      defaultTransport,
+		PackageSize:    defaultPackageSize,
+		ContentType:    defaultContentType,
+	}
+	config.Dump(configs)
+
+	if err := config.Parse([]string{configSection}, configs, &cfg); err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+func provideClientOpts(cfg *clientConfig) ([]client.Option, error) {
+	return []client.Option{client.WithClientPoolHosts(1), client.WithClientPoolSize(cfg.PoolSize), client.WithClientConnectionTimeout(time.Duration(cfg.Timeout) * time.Second)}, nil
 }

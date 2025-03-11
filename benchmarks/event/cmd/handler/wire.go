@@ -23,7 +23,7 @@ func wireRun(
 	serviceContext *cli.ServiceContext,
 	components *types.Components,
 	logger log.Logger,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 ) (wireRunResult, error) {
 	// Orb start
 	for _, c := range components.Iterate(false) {

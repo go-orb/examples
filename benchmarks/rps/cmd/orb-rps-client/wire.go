@@ -7,9 +7,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
+	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/types"
@@ -20,8 +22,7 @@ import (
 
 type wireRunCallback func(
 	ctx context.Context,
-	serviceName types.ServiceName,
-	configs types.ConfigData,
+	cfg *clientConfig,
 	logger log.Logger,
 	cli client.Type,
 ) error
@@ -32,8 +33,7 @@ type wireRunResult struct{}
 func wireRun(
 	serviceContext *cli.ServiceContext,
 	components *types.Components,
-	serviceName types.ServiceName,
-	configs types.ConfigData,
+	cfg *clientConfig,
 	logger log.Logger,
 	clientWire client.Type,
 	cb wireRunCallback,
@@ -50,7 +50,7 @@ func wireRun(
 	}
 
 	// Actual code
-	runErr := cb(serviceContext.Context(), serviceName, configs, logger, clientWire)
+	runErr := cb(serviceContext.Context(), cfg, logger, clientWire)
 
 	// Orb shutdown.
 	ctx := context.Background()
@@ -65,6 +65,30 @@ func wireRun(
 	}
 
 	return wireRunResult{}, runErr
+}
+
+func provideClientConfig(serviceName types.ServiceName, configs types.ConfigData) (*clientConfig, error) {
+	cfg := &clientConfig{
+		BypassRegistry: defaultBypassRegistry,
+		PoolSize:       defaultPoolSize,
+		Connections:    defaultConnections,
+		Duration:       defaultDuration,
+		Timeout:        defaultTimeout,
+		Threads:        defaultThreads,
+		Transport:      defaultTransport,
+		PackageSize:    defaultPackageSize,
+		ContentType:    defaultContentType,
+	}
+
+	if err := config.Parse([]string{configSection}, configs, &cfg); err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+func provideClientOpts(cfg *clientConfig) ([]client.Option, error) {
+	return []client.Option{client.WithClientPoolHosts(1), client.WithClientPoolSize(cfg.PoolSize), client.WithClientConnectionTimeout(time.Duration(cfg.Timeout) * time.Second)}, nil
 }
 
 func run(
@@ -86,7 +110,10 @@ func run(
 		log.ProvideNoOpts,
 
 		registry.ProvideNoOpts,
-		client.ProvideNoOpts,
+
+		provideClientConfig,
+		provideClientOpts,
+		client.Provide,
 
 		wireRun,
 	))

@@ -22,14 +22,14 @@ type wireRunResult struct{}
 type wireRunCallback func(
 	ctx context.Context,
 	logger log.Logger,
-	event event.Handler,
+	event event.Type,
 ) error
 
 func wireRun(
 	serviceContext *cli.ServiceContext,
 	components *types.Components,
 	logger log.Logger,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	// Orb start

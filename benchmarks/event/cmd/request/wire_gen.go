@@ -56,11 +56,11 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	handler, err := event.ProvideNoOpts(serviceName, configData, v2, logger)
+	eventType, err := event.ProvideNoOpts(serviceName, configData, v2, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceName, configData, v2, logger, handler, cb)
+	mainWireRunResult, err := wireRun(serviceName, configData, v2, logger, eventType, cb)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -78,14 +78,14 @@ type wireRunCallback func(
 	serviceName types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 ) error
 
 func wireRun(
 	serviceName types.ServiceName,
 	configs types.ConfigData,
 	components *types.Components,
-	logger log.Logger, event2 event.Handler,
+	logger log.Logger, event2 event.Type,
 
 	cb wireRunCallback,
 ) (wireRunResult, error) {

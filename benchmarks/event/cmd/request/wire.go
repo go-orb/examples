@@ -26,7 +26,7 @@ type wireRunCallback func(
 	serviceName types.ServiceName,
 	configs types.ConfigData,
 	logger log.Logger,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 ) error
 
 func wireRun(
@@ -34,7 +34,7 @@ func wireRun(
 	configs types.ConfigData,
 	components *types.Components,
 	logger log.Logger,
-	event event.Handler,
+	event event.Type,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

@@ -55,11 +55,11 @@ func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	handler, err := event.ProvideNoOpts(serviceName, configData, v, logger)
+	eventType, err := event.ProvideNoOpts(serviceName, configData, v, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceContext, v, logger, handler)
+	mainWireRunResult, err := wireRun(serviceContext, v, logger, eventType)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -75,7 +75,7 @@ func wireRun(
 	serviceContext *cli.ServiceContext,
 	components *types.Components,
 	logger log.Logger,
-	eventHandler event.Handler,
+	eventHandler event.Type,
 ) (wireRunResult, error) {
 
 	for _, c := range components.Iterate(false) {
