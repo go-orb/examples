@@ -3,19 +3,19 @@ module github.com/go-orb/examples/realworld
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.2.2-0.20250311013353-9996c5ae2659
-	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250310151257-e3753cc29dd6
-	github.com/go-orb/plugins/cli/urfave v0.0.0-20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/client/orb v0.1.4-0.20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/log/slog v0.1.1-0.20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/registry/memory v0.0.0-20250311025432-c3f6c11bc7a0
-	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250311025432-c3f6c11bc7a0
+	github.com/go-orb/go-orb v0.2.2-0.20250311024506-e44d2eb21aa9
+	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250311030251-33347369bbe1
+	github.com/go-orb/plugins/cli/urfave v0.0.0-20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/client/orb v0.1.4-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/log/slog v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/registry/memory v0.0.0-20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250311055558-8297a94ff1c7
 	github.com/go-orb/service/httpgateway v0.0.0-20250308154101-ef3cf24db6e7
 	github.com/go-orb/wire v0.7.0
 	google.golang.org/grpc v1.71.0
@@ -32,7 +32,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.10.0 // indirect
-	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250311025432-c3f6c11bc7a0 // indirect
+	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250311055558-8297a94ff1c7 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.22.0 // indirect

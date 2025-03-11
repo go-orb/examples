@@ -20,7 +20,7 @@ import (
 
 	echoproto "github.com/go-orb/examples/benchmarks/rps/proto/echo"
 
-	// Import required plugins
+	// Import required plugins.
 	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/client/orb"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
@@ -29,7 +29,7 @@ import (
 	_ "github.com/go-orb/plugins/log/slog"
 	_ "github.com/go-orb/plugins/registry/consul"
 
-	// Transport plugins
+	// Transport plugins.
 	_ "github.com/go-orb/plugins/client/orb_transport/drpc"
 	_ "github.com/go-orb/plugins/client/orb_transport/grpc"
 	_ "github.com/go-orb/plugins/client/orb_transport/h2c"
@@ -134,9 +134,15 @@ func setupClientOptions(ctx context.Context, cfg *clientConfig, cli client.Type,
 }
 
 // runBenchmark executes the benchmark with the given configuration.
-func runBenchmark(ctx context.Context, duration int, connections int, cli client.Type, logger log.Logger,
-	msg []byte, opts []client.CallOption) (uint64, uint64) {
-
+func runBenchmark(
+	ctx context.Context,
+	duration int,
+	connections int,
+	cli client.Type,
+	logger log.Logger,
+	msg []byte,
+	opts []client.CallOption,
+) (uint64, uint64) {
 	var wg sync.WaitGroup
 
 	stats := &benchStats{}
@@ -192,7 +198,7 @@ func bench(ctx context.Context, cfg *clientConfig, logger log.Logger, cli client
 
 	// Run warmup phase
 	logger.Info("Warming up...")
-	warmupOk, warmupErr := runBenchmark(ctx, 1, cfg.Connections, cli, logger, msg, opts)
+	warmupOk, warmupErr := runBenchmark(ctx, 5, cfg.Connections, cli, logger, msg, opts)
 	logger.Debug("Warmup complete", "requests_ok", warmupOk, "requests_error", warmupErr)
 
 	// Run benchmark phase

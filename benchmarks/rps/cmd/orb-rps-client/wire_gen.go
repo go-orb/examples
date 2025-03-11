@@ -28,7 +28,7 @@ import (
 	_ "github.com/go-orb/plugins/client/orb_transport/http"
 	_ "github.com/go-orb/plugins/client/orb_transport/http3"
 	_ "github.com/go-orb/plugins/client/orb_transport/https"
-	_ "github.com/go-orb/plugins/codecs/json"
+	_ "github.com/go-orb/plugins/codecs/goccyjson"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
@@ -152,7 +152,6 @@ func provideClientConfig(serviceName types.ServiceName, configs types.ConfigData
 		PackageSize:    defaultPackageSize,
 		ContentType:    defaultContentType,
 	}
-	config.Dump(configs)
 
 	if err := config.Parse([]string{configSection}, configs, &cfg); err != nil {
 		return nil, err

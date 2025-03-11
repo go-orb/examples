@@ -141,6 +141,8 @@ func (m *GoOrb) Lint(
 						Sharing: dagger.CacheSharingMode("SHARED"),
 					},
 				).
+				WithEnvVariable("GOPROXY", "direct").
+				WithEnvVariable("GOSUMDB", "off").
 				WithMountedCache("/root/.cache/golangci-lint", dag.CacheVolume("golangci-lint")).
 				WithDirectory("/work/src", root.Directory(dir)).
 				WithWorkdir("/work/src").
@@ -171,6 +173,8 @@ func (m *GoOrb) goContainer(root *dagger.Directory, dir string) *dagger.Containe
 				Sharing: dagger.CacheSharingMode("SHARED"),
 			},
 		).
+		WithEnvVariable("GOPROXY", "direct").
+		WithEnvVariable("GOSUMDB", "off").
 		WithDirectory("/work/src", root.Directory(dir)).
 		WithWorkdir("/work/src")
 }
@@ -256,8 +260,6 @@ func (m *GoOrb) Update(ctx context.Context, root *dagger.Directory) (*AllResult,
 			}
 
 			c := m.goContainer(root, dir).
-				WithEnvVariable("GOPROXY", "direct").
-				WithEnvVariable("GOSUMDB", "off").
 				WithExec([]string{"go", "get", "-u", "-t", "./..."}).
 				WithExec([]string{"go", "get", "-u", "github.com/go-orb/go-orb@latest"}).
 				WithExec([]string{"bash", "-c", "for m in $(grep github.com/go-orb/plugins go.mod | grep -E -v \"^module\" | awk '{ print $1 }'); do go get -u \"${m}@latest\"; done"}).
