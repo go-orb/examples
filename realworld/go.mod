@@ -7,6 +7,7 @@ require (
 	github.com/go-orb/plugins-experimental/registry/mdns v0.0.0-20250311030251-33347369bbe1
 	github.com/go-orb/plugins/cli/urfave v0.0.0-20250311055558-8297a94ff1c7
 	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/client/middleware/retry v0.0.0-20250311145952-4689d2ffcd34
 	github.com/go-orb/plugins/client/orb v0.1.4-0.20250311055558-8297a94ff1c7
 	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250311055558-8297a94ff1c7
 	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250311055558-8297a94ff1c7
@@ -15,7 +16,9 @@ require (
 	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250311055558-8297a94ff1c7
 	github.com/go-orb/plugins/log/slog v0.1.1-0.20250311055558-8297a94ff1c7
 	github.com/go-orb/plugins/registry/memory v0.0.0-20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/server/drpc v0.1.0
 	github.com/go-orb/plugins/server/grpc v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/plugins/server/memory v0.0.0-20250311145952-4689d2ffcd34
 	github.com/go-orb/service/httpgateway v0.0.0-20250308154101-ef3cf24db6e7
 	github.com/go-orb/wire v0.7.0
 	google.golang.org/grpc v1.71.0

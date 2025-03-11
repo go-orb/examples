@@ -20,6 +20,9 @@ import (
 	"github.com/go-orb/go-orb/server"
 
 	grpc "google.golang.org/grpc"
+
+	mdrpc "github.com/go-orb/plugins/server/drpc"
+	memory "github.com/go-orb/plugins/server/memory"
 )
 
 // HandlerLobbyService is the name of a service, it's here to static type/reference.
@@ -46,6 +49,38 @@ type LobbyServiceHandler interface {
 	ListGames(ctx context.Context, req *emptypb.Empty) (*ListGamesResponse, error)
 }
 
+// registerLobbyServiceDRPCHandler registers the service to an dRPC server.
+func registerLobbyServiceDRPCHandler(srv *mdrpc.Server, handler LobbyServiceHandler) error {
+	desc := DRPCLobbyServiceDescription{}
+
+	// Register with the server/drpc(.Mux).
+	err := srv.Router().Register(handler, desc)
+	if err != nil {
+		return err
+	}
+
+	// Add each endpoint name of this handler to the orb drpc server.
+	srv.AddEndpoint("/lobby.v1.LobbyService/ListGames")
+
+	return nil
+}
+
+// registerLobbyServiceMemoryHandler registers the service to an dRPC server.
+func registerLobbyServiceMemoryHandler(srv *memory.Server, handler LobbyServiceHandler) error {
+	desc := DRPCLobbyServiceDescription{}
+
+	// Register with the server/drpc(.Mux).
+	err := srv.Router().Register(handler, desc)
+	if err != nil {
+		return err
+	}
+
+	// Add each endpoint name of this handler to the orb drpc server.
+	srv.AddEndpoint("/lobby.v1.LobbyService/ListGames")
+
+	return nil
+}
+
 // RegisterLobbyServiceHandler will return a registration function that can be
 // provided to entrypoints as a handler registration.
 func RegisterLobbyServiceHandler(handler LobbyServiceHandler) server.RegistrationFunc {
@@ -54,6 +89,10 @@ func RegisterLobbyServiceHandler(handler LobbyServiceHandler) server.Registratio
 
 		case grpc.ServiceRegistrar:
 			registerLobbyServiceGRPCHandler(srv, handler)
+		case *mdrpc.Server:
+			registerLobbyServiceDRPCHandler(srv, handler)
+		case *memory.Server:
+			registerLobbyServiceMemoryHandler(srv, handler)
 		default:
 			log.Warn("No provider for this server found", "proto", "lobby_v1/lobby_v1.proto", "handler", "LobbyService", "server", s)
 		}

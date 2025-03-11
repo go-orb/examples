@@ -32,6 +32,8 @@ github.com/go-orb/plugins/cli/urfave v0.0.0-20250311055558-8297a94ff1c7 h1:CrWPU
 github.com/go-orb/plugins/cli/urfave v0.0.0-20250311055558-8297a94ff1c7/go.mod h1:Yvfr2ylrseKWmn4cqLgWdv/cSt6Nsf5VCVS+XXWHva0=
 github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250311055558-8297a94ff1c7 h1:rQzDb9HXZNtqdRGgDQVwSf+AZyCt4rgTqu+HM6AhWC4=
 github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250311055558-8297a94ff1c7/go.mod h1:veCNCrbsVvnTt9VnyQzm3kQSTqo0f5D8X56B09c/kbc=
+github.com/go-orb/plugins/client/middleware/retry v0.0.0-20250311145952-4689d2ffcd34 h1:WdRv8KBaGQhGPen/l/nGCA7E1EZsUccJbuJeLBVMmao=
+github.com/go-orb/plugins/client/middleware/retry v0.0.0-20250311145952-4689d2ffcd34/go.mod h1:nfvWH66REi/wYLNaqyzuTECJguLHnNU4LZrc9rGZ0F4=
 github.com/go-orb/plugins/client/orb v0.1.4-0.20250311055558-8297a94ff1c7 h1:CQ8vXM5k7k68PIWHslyBnOjWzX5NvSVMWkgbhBl0Vqc=
 github.com/go-orb/plugins/client/orb v0.1.4-0.20250311055558-8297a94ff1c7/go.mod h1:/Wx09PSBKu237UD2F6xLU/2mWfLHHVzOuT7BHWresyA=
 github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250311055558-8297a94ff1c7 h1:/ApSfOWocNduwMQy8JLvQu6SrmO6LezGfedzoj0wFr4=
@@ -52,8 +54,12 @@ github.com/go-orb/plugins/registry/memory v0.0.0-20250311055558-8297a94ff1c7 h1:
 github.com/go-orb/plugins/registry/memory v0.0.0-20250311055558-8297a94ff1c7/go.mod h1:QOHpPyFnuHBUHSZtfUbXhXzJOEUIvLl7OeqMdegdBag=
 github.com/go-orb/plugins/registry/tests v0.1.1-0.20250311025432-c3f6c11bc7a0 h1:qYcEpS/5fhsz9p/f6lRnSNpG56ElLdKuTWtOWB0jIq8=
 github.com/go-orb/plugins/registry/tests v0.1.1-0.20250311025432-c3f6c11bc7a0/go.mod h1:onO88ks5XnYURjkMeiew64eeT/SBh/46hB2tQyHeCLs=
+github.com/go-orb/plugins/server/drpc v0.1.0 h1:A1v02BZ48Hj8OjlTkVhiWegrc7xEhIkHhDl9rH9TN1s=
+github.com/go-orb/plugins/server/drpc v0.1.0/go.mod h1:fzIeb9gqVAdU9NqWGwdnsrGPhKhAJGBLECkUvNuFx1w=
 github.com/go-orb/plugins/server/grpc v0.1.1-0.20250311055558-8297a94ff1c7 h1:PhUDnf9P5RWAevZ9Iya29JrFLMYm3FvuN6LoHl4bL+s=
 github.com/go-orb/plugins/server/grpc v0.1.1-0.20250311055558-8297a94ff1c7/go.mod h1:JtobWZw+gUSx+/iX4LsXwvv1Njjli1f3LCcDIzt4QUk=
+github.com/go-orb/plugins/server/memory v0.0.0-20250311145952-4689d2ffcd34 h1:efOKJHhVvsb7psmVGREzRMXLPZ9J4r17qhTG5P6kEQ8=
+github.com/go-orb/plugins/server/memory v0.0.0-20250311145952-4689d2ffcd34/go.mod h1:T82rEQPeex21kNXVZHgi+KphvaZ4k1pevKJFPtinN+I=
 github.com/go-orb/service/httpgateway v0.0.0-20250308154101-ef3cf24db6e7 h1:SCKuz1Ys7bvTR9tqkM4vvZbhMoechG2ndCSID7+oh90=
 github.com/go-orb/service/httpgateway v0.0.0-20250308154101-ef3cf24db6e7/go.mod h1:vPKvOtrg9sEIxh6jhSuqh6K84Dsy44oU0oVBNACMyq8=
 github.com/go-orb/wire v0.7.0 h1:P9S100bM8nhAgW6e7EJrbi5vzNXCsP/Q1ByIEV5+hUQ=

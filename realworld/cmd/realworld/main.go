@@ -13,6 +13,7 @@ import (
 
 	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/client/middleware/log"
+	_ "github.com/go-orb/plugins/client/middleware/retry"
 	_ "github.com/go-orb/plugins/client/orb"
 	_ "github.com/go-orb/plugins/client/orb_transport/grpc"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
@@ -46,7 +47,9 @@ func main() {
 				Usage:       "Set the registry plugin, one of mdns, consul, memory",
 			},
 		},
-		Commands: []*cli.Command{},
+		Commands:      []*cli.Command{},
+		Configs:       []string{config},
+		ConfigsFormat: []string{"yaml"},
 	}
 
 	app.Commands = append(app.Commands, monolith.MainCommands()...)
