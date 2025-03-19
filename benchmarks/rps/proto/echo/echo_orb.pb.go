@@ -81,24 +81,23 @@ func registerEchoMemoryHandler(srv *memory.Server, handler EchoHandler) error {
 
 // registerEchoHTTPHandler registers the service to an HTTP server.
 func registerEchoHTTPHandler(srv *mhttp.Server, handler EchoHandler) {
-	r := srv.Router()
-	r.Post("/echo.Echo/Echo", mhttp.NewGRPCHandler(srv, handler.Echo, HandlerEcho, "Echo"))
+	srv.Router().Post("/echo.Echo/Echo", mhttp.NewGRPCHandler(srv, handler.Echo, HandlerEcho, "Echo"))
 }
 
 // RegisterEchoHandler will return a registration function that can be
 // provided to entrypoints as a handler registration.
-func RegisterEchoHandler(handler EchoHandler) server.RegistrationFunc {
+func RegisterEchoHandler(handler any) server.RegistrationFunc {
 	return func(s any) {
 		switch srv := s.(type) {
 
 		case grpc.ServiceRegistrar:
-			registerEchoGRPCHandler(srv, handler)
+			registerEchoGRPCHandler(srv, handler.(EchoServer))
 		case *mdrpc.Server:
-			registerEchoDRPCHandler(srv, handler)
+			registerEchoDRPCHandler(srv, handler.(EchoHandler))
 		case *memory.Server:
-			registerEchoMemoryHandler(srv, handler)
+			registerEchoMemoryHandler(srv, handler.(EchoHandler))
 		case *mhttp.Server:
-			registerEchoHTTPHandler(srv, handler)
+			registerEchoHTTPHandler(srv, handler.(EchoHandler))
 		default:
 			log.Warn("No provider for this server found", "proto", "echo/echo.proto", "handler", "Echo", "server", s)
 		}

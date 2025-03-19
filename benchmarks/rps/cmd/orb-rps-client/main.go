@@ -32,10 +32,7 @@ import (
 	// Transport plugins.
 	_ "github.com/go-orb/plugins/client/orb_transport/drpc"
 	_ "github.com/go-orb/plugins/client/orb_transport/grpc"
-	_ "github.com/go-orb/plugins/client/orb_transport/h2c"
 	_ "github.com/go-orb/plugins/client/orb_transport/http"
-	_ "github.com/go-orb/plugins/client/orb_transport/http3"
-	_ "github.com/go-orb/plugins/client/orb_transport/https"
 )
 
 const serverName = "benchmarks.rps.server"
@@ -108,26 +105,14 @@ func setupClientOptions(ctx context.Context, cfg *clientConfig, cli client.Type,
 		logger.Debug("Resolving service", "server", serverName)
 
 		// Resolve service nodes
-		nodes, err := cli.ResolveService(ctx, serverName, cfg.Transport)
+		address, _, err := cli.SelectService(ctx, serverName, client.WithPreferredTransports(cfg.Transport))
 		if err != nil {
 			return nil, fmt.Errorf("failed to resolve service: %w", err)
 		}
 
-		// Determine preferred transport
-		preferredTransports := cli.Config().PreferredTransports
-		if cfg.Transport != "" {
-			preferredTransports = []string{cfg.Transport}
-		}
-
-		// Select a node
-		node, err := cli.Config().Selector(ctx, serverName, nodes, preferredTransports, false)
-		if err != nil {
-			return nil, fmt.Errorf("failed to select node: %w", err)
-		}
-
 		// Add direct URL to options
-		opts = append(opts, client.WithURL(fmt.Sprintf("%s://%s", node.Transport, node.Address)))
-		logger.Info("Using transport", "transport", node.Transport)
+		opts = append(opts, client.WithURL(fmt.Sprintf("%s://%s", cfg.Transport, address)))
+		logger.Info("Using transport", "transport", cfg.Transport)
 	}
 
 	return opts, nil

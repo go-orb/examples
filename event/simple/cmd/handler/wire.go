@@ -14,7 +14,7 @@ import (
 	"github.com/go-orb/go-orb/types"
 	"github.com/go-orb/plugins/cli/urfave"
 	"github.com/go-orb/wire"
-	"github.com/google/uuid"
+	"github.com/lithammer/shortuuid"
 )
 
 // wireRunResult is here so "wire" has a type for the return value of wireRun.
@@ -40,7 +40,7 @@ func wireRun(
 	//
 	// Actual code
 	userNewHandler := func(_ context.Context, req *user_new.Request) (*user_new.Resp, error) {
-		return &user_new.Resp{Name: req.GetName(), Uuid: uuid.New().String()}, nil
+		return &user_new.Resp{Name: req.GetName(), Uuid: shortuuid.New()}, nil
 	}
 
 	event.HandleRequest(serviceContext.Context(), eventHandler, "user.new", userNewHandler)
