@@ -17,7 +17,6 @@ import (
 	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
-	"github.com/go-orb/go-orb/types"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/event/natsjs"
@@ -96,9 +95,7 @@ func connection(
 //
 //nolint:funlen
 func bench(
-	ctx context.Context,
-	sn types.ServiceName,
-	configs types.ConfigData,
+	svcCtx *cli.ServiceContext,
 	logger log.Logger,
 	eventHandler event.Type,
 ) error {
@@ -110,8 +107,7 @@ func bench(
 		PackageSize: defaultPackageSize,
 	}
 
-	sections := append(types.SplitServiceName(sn), configSection)
-	if err := config.Parse(sections, configs, &cfg); err != nil {
+	if err := config.Parse(nil, event.DefaultConfigSection, svcCtx.Config, &cfg); err != nil {
 		return err
 	}
 
@@ -126,7 +122,7 @@ func bench(
 
 	runtime.GOMAXPROCS(cfg.Threads)
 
-	wCtx, wCancel := context.WithCancel(ctx)
+	wCtx, wCancel := context.WithCancel(svcCtx.Context())
 
 	// Create random bytes to ping-pong on each request.
 	msg := make([]byte, cfg.PackageSize)
@@ -169,7 +165,7 @@ func bench(
 	//
 	logger.Info("Now running the benchmark")
 
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(svcCtx.Context())
 
 	// Timer to end requests
 	time.AfterFunc(time.Second*time.Duration(cfg.Duration), func() {

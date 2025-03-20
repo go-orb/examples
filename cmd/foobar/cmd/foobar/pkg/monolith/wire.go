@@ -60,6 +60,8 @@ func ProvideRunner(
 	panic(wire.Build(
 		provideServiceContext,
 
+		cli.ProvideAppConfigData,
+
 		service1.ProvideRunner,
 
 		provideActionServer,

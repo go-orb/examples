@@ -24,10 +24,7 @@ import (
 	_ "github.com/go-orb/plugins/client/orb"
 	_ "github.com/go-orb/plugins/client/orb_transport/drpc"
 	_ "github.com/go-orb/plugins/client/orb_transport/grpc"
-	_ "github.com/go-orb/plugins/client/orb_transport/h2c"
 	_ "github.com/go-orb/plugins/client/orb_transport/http"
-	_ "github.com/go-orb/plugins/client/orb_transport/http3"
-	_ "github.com/go-orb/plugins/client/orb_transport/https"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/config/source/file"
@@ -46,7 +43,11 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceName, err := cli.ProvideServiceName(serviceContext)
+	mainClientConfig, err := provideClientConfig(serviceContext)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -58,23 +59,15 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	configData, err := cli.ProvideConfigData(serviceContext, v2)
+	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v2)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainClientConfig, err := provideClientConfig(serviceName, configData)
+	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	logger, err := log.ProvideNoOpts(serviceName, configData, v)
-	if err != nil {
-		return wireRunResult{}, err
-	}
-	serviceVersion, err := cli.ProvideServiceVersion(serviceContext)
-	if err != nil {
-		return wireRunResult{}, err
-	}
-	registryType, err := registry.ProvideNoOpts(serviceName, serviceVersion, configData, v, logger)
+	registryType, err := registry.ProvideNoOpts(serviceContext, v, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -82,7 +75,7 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	clientType, err := client.Provide(serviceName, configData, v, logger, registryType, v3...)
+	clientType, err := client.Provide(serviceContext, v, logger, registryType, v3...)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -140,7 +133,7 @@ func wireRun(
 	return wireRunResult{}, runErr
 }
 
-func provideClientConfig(serviceName types.ServiceName, configs types.ConfigData) (*clientConfig, error) {
+func provideClientConfig(svcCtx *cli.ServiceContext) (*clientConfig, error) {
 	cfg := &clientConfig{
 		BypassRegistry: defaultBypassRegistry,
 		PoolSize:       defaultPoolSize,
@@ -153,7 +146,7 @@ func provideClientConfig(serviceName types.ServiceName, configs types.ConfigData
 		ContentType:    defaultContentType,
 	}
 
-	if err := config.Parse([]string{configSection}, configs, &cfg); err != nil {
+	if err := config.Parse(nil, configSection, svcCtx.Config, &cfg); err != nil {
 		return nil, err
 	}
 

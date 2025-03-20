@@ -14,18 +14,49 @@ import (
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/server"
 
+	"google.golang.org/protobuf/proto"
+	"storj.io/drpc"
+
 	mdrpc "github.com/go-orb/plugins/server/drpc"
+	memory "github.com/go-orb/plugins/server/memory"
 )
 
 // HandlerAuth is the name of a service, it's here to static type/reference.
 const HandlerAuth = "auth.v1.Auth"
 const EndpointAuthLogin = "/auth.v1.Auth/Login"
 const EndpointAuthIntrospect = "/auth.v1.Auth/Introspect"
+
+// orbEncoding_Auth_proto is a protobuf encoder for the auth.v1.Auth service.
+type orbEncoding_Auth_proto struct{}
+
+// Marshal implements the drpc.Encoding interface.
+func (orbEncoding_Auth_proto) Marshal(msg drpc.Message) ([]byte, error) {
+	m, ok := msg.(proto.Message)
+	if !ok {
+		return nil, fmt.Errorf("message is not a proto.Message: %T", msg)
+	}
+	return proto.Marshal(m)
+}
+
+// Unmarshal implements the drpc.Encoding interface.
+func (orbEncoding_Auth_proto) Unmarshal(data []byte, msg drpc.Message) error {
+	m, ok := msg.(proto.Message)
+	if !ok {
+		return fmt.Errorf("message is not a proto.Message: %T", msg)
+	}
+	return proto.Unmarshal(data, m)
+}
+
+// Name implements the drpc.Encoding interface.
+func (orbEncoding_Auth_proto) Name() string {
+	return "proto"
+}
 
 // AuthClient is the client for auth.v1.Auth
 type AuthClient struct {
@@ -54,15 +85,55 @@ type AuthHandler interface {
 	Introspect(ctx context.Context, req *emptypb.Empty) (*IntrospectResponse, error)
 }
 
+// orbDRPCAuthHandler wraps a AuthHandler to implement DRPCAuthServer.
+type orbDRPCAuthHandler struct {
+	handler AuthHandler
+}
+
+// Login implements the DRPCAuthServer interface by adapting to the AuthHandler.
+func (w *orbDRPCAuthHandler) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
+	return w.handler.Login(ctx, req)
+}
+
+// Introspect implements the DRPCAuthServer interface by adapting to the AuthHandler.
+func (w *orbDRPCAuthHandler) Introspect(ctx context.Context, req *emptypb.Empty) (*IntrospectResponse, error) {
+	return w.handler.Introspect(ctx, req)
+}
+
+// Stream adapters to convert DRPC streams to ORB streams.
+
+// Verification that our adapters implement the required interfaces.
+var _ DRPCAuthServer = (*orbDRPCAuthHandler)(nil)
+
 // registerAuthDRPCHandler registers the service to an dRPC server.
 func registerAuthDRPCHandler(srv *mdrpc.Server, handler AuthHandler) error {
 	desc := DRPCAuthDescription{}
 
-	// Register with DRPC.
-	r := srv.Router()
+	// Wrap the ORB handler with our adapter to make it compatible with DRPC.
+	drpcHandler := &orbDRPCAuthHandler{handler: handler}
 
 	// Register with the server/drpc(.Mux).
-	err := r.Register(handler, desc)
+	err := srv.Router().Register(drpcHandler, desc)
+	if err != nil {
+		return err
+	}
+
+	// Add each endpoint name of this handler to the orb drpc server.
+	srv.AddEndpoint("/auth.v1.Auth/Login")
+	srv.AddEndpoint("/auth.v1.Auth/Introspect")
+
+	return nil
+}
+
+// registerAuthMemoryHandler registers the service to a memory server.
+func registerAuthMemoryHandler(srv *memory.Server, handler AuthHandler) error {
+	desc := DRPCAuthDescription{}
+
+	// Wrap the ORB handler with our adapter to make it compatible with DRPC.
+	drpcHandler := &orbDRPCAuthHandler{handler: handler}
+
+	// Register with the server/drpc(.Mux).
+	err := srv.Router().Register(drpcHandler, desc)
 	if err != nil {
 		return err
 	}
@@ -76,12 +147,14 @@ func registerAuthDRPCHandler(srv *mdrpc.Server, handler AuthHandler) error {
 
 // RegisterAuthHandler will return a registration function that can be
 // provided to entrypoints as a handler registration.
-func RegisterAuthHandler(handler AuthHandler) server.RegistrationFunc {
+func RegisterAuthHandler(handler any) server.RegistrationFunc {
 	return func(s any) {
 		switch srv := s.(type) {
 
 		case *mdrpc.Server:
-			registerAuthDRPCHandler(srv, handler)
+			registerAuthDRPCHandler(srv, handler.(AuthHandler))
+		case *memory.Server:
+			registerAuthMemoryHandler(srv, handler.(AuthHandler))
 		default:
 			log.Warn("No provider for this server found", "proto", "auth_v1/auth.proto", "handler", "Auth", "server", s)
 		}

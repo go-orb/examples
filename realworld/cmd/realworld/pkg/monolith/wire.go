@@ -83,6 +83,7 @@ func provideRunner(appContext *cli.AppContext,
 // ProvideRunner provides a runner for the service.
 func ProvideRunner(
 	appContext *cli.AppContext,
+	appConfigData cli.AppConfigData,
 	flags []*cli.Flag,
 ) (Runner, error) {
 	panic(wire.Build(

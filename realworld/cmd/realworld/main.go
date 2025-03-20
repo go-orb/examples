@@ -47,9 +47,8 @@ func main() {
 				Usage:       "Set the registry plugin, one of mdns, consul, memory",
 			},
 		},
-		Commands:      []*cli.Command{},
-		Configs:       []string{config},
-		ConfigsFormat: []string{"yaml"},
+		Commands:         []*cli.Command{},
+		HardcodedConfigs: []cli.HardcodedConfig{{Format: "yaml", Data: config}},
 	}
 
 	app.Commands = append(app.Commands, monolith.MainCommands()...)

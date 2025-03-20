@@ -39,14 +39,6 @@ func provideServerOpts(logger log.Logger) ([]server.ConfigOption, error) {
 // wire needs a explicit type for each provider including "wireRun".
 type wireRunResult struct{}
 
-// wireRunCallback is the actual code that runs the business logic.
-type wireRunCallback func(
-	ctx context.Context,
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
-	logger log.Logger,
-) error
-
 func wireRun(
 	serviceContext *cli.ServiceContext,
 	components *types.Components,
@@ -90,12 +82,11 @@ func run(
 		urfave.ProvideParser,
 		cli.ProvideParsedFlagsFromArgs,
 
+		cli.ProvideAppConfigData,
+		cli.ProvideServiceConfigData,
+
 		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
-
-		cli.ProvideConfigData,
-		cli.ProvideServiceName,
-		cli.ProvideServiceVersion,
 
 		log.ProvideNoOpts,
 		registry.ProvideNoOpts,

@@ -32,7 +32,11 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceName, err := cli.ProvideServiceName(serviceContext)
+	v, err := types.ProvideComponents()
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -40,27 +44,23 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	v, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
+	v2, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	configData, err := cli.ProvideConfigData(serviceContext, v)
+	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v2)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	v2, err := types.ProvideComponents()
+	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	logger, err := log.ProvideNoOpts(serviceName, configData, v2)
+	eventType, err := event.ProvideNoOpts(serviceContext, v, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	eventType, err := event.ProvideNoOpts(serviceName, configData, v2, logger)
-	if err != nil {
-		return wireRunResult{}, err
-	}
-	mainWireRunResult, err := wireRun(serviceName, configData, v2, logger, eventType, cb)
+	mainWireRunResult, err := wireRun(serviceContext, v, logger, eventType, cb)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -74,16 +74,13 @@ type wireRunResult struct{}
 
 // wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
-	ctx context.Context,
-	serviceName types.ServiceName,
-	configs types.ConfigData,
+	svcCtx *cli.ServiceContext,
 	logger log.Logger,
 	eventHandler event.Type,
 ) error
 
 func wireRun(
-	serviceName types.ServiceName,
-	configs types.ConfigData,
+	serviceContext *cli.ServiceContext,
 	components *types.Components,
 	logger log.Logger, event2 event.Type,
 
@@ -100,7 +97,7 @@ func wireRun(
 		}
 	}
 
-	runErr := cb(ctx, serviceName, configs, logger, event2)
+	runErr := cb(serviceContext, logger, event2)
 
 	ctx = context.Background()
 

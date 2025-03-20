@@ -42,7 +42,7 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceName, err := cli.ProvideServiceName(serviceContext)
+	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -54,23 +54,19 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	configData, err := cli.ProvideConfigData(serviceContext, v2)
+	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v2)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	logger, err := log.ProvideNoOpts(serviceName, configData, v)
+	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceVersion, err := cli.ProvideServiceVersion(serviceContext)
+	registryType, err := registry.ProvideNoOpts(serviceContext, v, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	registryType, err := registry.ProvideNoOpts(serviceName, serviceVersion, configData, v, logger)
-	if err != nil {
-		return wireRunResult{}, err
-	}
-	clientType, err := client.ProvideNoOpts(serviceName, configData, v, logger, registryType)
+	clientType, err := client.ProvideNoOpts(serviceContext, v, logger, registryType)
 	if err != nil {
 		return wireRunResult{}, err
 	}

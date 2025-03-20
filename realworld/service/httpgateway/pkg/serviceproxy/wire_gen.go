@@ -16,12 +16,12 @@ import (
 // Injectors from wire.go:
 
 // ProvideRunner provides the httpgateway runner.
-func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (service.Runner, error) {
+func ProvideRunner(appContext *cli.AppContext, appConfigData cli.AppConfigData, flags []*cli.Flag) (service.Runner, error) {
 	serviceContext, err := provideServiceContext(appContext)
 	if err != nil {
 		return nil, err
 	}
-	runner, err := service.ProvideRunner(serviceContext, flags)
+	runner, err := service.ProvideRunner(serviceContext, appConfigData, flags)
 	if err != nil {
 		return nil, err
 	}

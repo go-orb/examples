@@ -10,10 +10,14 @@ package echo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/server"
+
+	"google.golang.org/protobuf/proto"
+	"storj.io/drpc"
 
 	grpc "google.golang.org/grpc"
 
@@ -26,6 +30,32 @@ import (
 // HandlerEcho is the name of a service, it's here to static type/reference.
 const HandlerEcho = "echo.Echo"
 const EndpointEchoEcho = "/echo.Echo/Echo"
+
+// orbEncoding_Echo_proto is a protobuf encoder for the echo.Echo service.
+type orbEncoding_Echo_proto struct{}
+
+// Marshal implements the drpc.Encoding interface.
+func (orbEncoding_Echo_proto) Marshal(msg drpc.Message) ([]byte, error) {
+	m, ok := msg.(proto.Message)
+	if !ok {
+		return nil, fmt.Errorf("message is not a proto.Message: %T", msg)
+	}
+	return proto.Marshal(m)
+}
+
+// Unmarshal implements the drpc.Encoding interface.
+func (orbEncoding_Echo_proto) Unmarshal(data []byte, msg drpc.Message) error {
+	m, ok := msg.(proto.Message)
+	if !ok {
+		return fmt.Errorf("message is not a proto.Message: %T", msg)
+	}
+	return proto.Unmarshal(data, m)
+}
+
+// Name implements the drpc.Encoding interface.
+func (orbEncoding_Echo_proto) Name() string {
+	return "proto"
+}
 
 // EchoClient is the client for echo.Echo
 type EchoClient struct {
@@ -47,12 +77,53 @@ type EchoHandler interface {
 	Echo(ctx context.Context, req *Req) (*Resp, error)
 }
 
+// orbGRPCEcho provides the adapter to convert a EchoHandler to a gRPC EchoServer.
+type orbGRPCEcho struct {
+	handler EchoHandler
+}
+
+// Echo implements the EchoServer interface by adapting to the EchoHandler.
+func (s *orbGRPCEcho) Echo(ctx context.Context, req *Req) (*Resp, error) {
+	return s.handler.Echo(ctx, req)
+}
+
+// Stream adapters to convert gRPC streams to ORB streams.
+
+// Verification that our adapters implement the required interfaces.
+var _ EchoServer = (*orbGRPCEcho)(nil)
+
+// registerEchoGRPCServerHandler registers the service to a gRPC server.
+func registerEchoGRPCServerHandler(srv grpc.ServiceRegistrar, handler EchoHandler) {
+	// Create the adapter to convert from EchoHandler to EchoServer
+	grpcHandler := &orbGRPCEcho{handler: handler}
+
+	srv.RegisterService(&Echo_ServiceDesc, grpcHandler)
+}
+
+// orbDRPCEchoHandler wraps a EchoHandler to implement DRPCEchoServer.
+type orbDRPCEchoHandler struct {
+	handler EchoHandler
+}
+
+// Echo implements the DRPCEchoServer interface by adapting to the EchoHandler.
+func (w *orbDRPCEchoHandler) Echo(ctx context.Context, req *Req) (*Resp, error) {
+	return w.handler.Echo(ctx, req)
+}
+
+// Stream adapters to convert DRPC streams to ORB streams.
+
+// Verification that our adapters implement the required interfaces.
+var _ DRPCEchoServer = (*orbDRPCEchoHandler)(nil)
+
 // registerEchoDRPCHandler registers the service to an dRPC server.
 func registerEchoDRPCHandler(srv *mdrpc.Server, handler EchoHandler) error {
 	desc := DRPCEchoDescription{}
 
+	// Wrap the ORB handler with our adapter to make it compatible with DRPC.
+	drpcHandler := &orbDRPCEchoHandler{handler: handler}
+
 	// Register with the server/drpc(.Mux).
-	err := srv.Router().Register(handler, desc)
+	err := srv.Router().Register(drpcHandler, desc)
 	if err != nil {
 		return err
 	}
@@ -63,12 +134,15 @@ func registerEchoDRPCHandler(srv *mdrpc.Server, handler EchoHandler) error {
 	return nil
 }
 
-// registerEchoMemoryHandler registers the service to an dRPC server.
+// registerEchoMemoryHandler registers the service to a memory server.
 func registerEchoMemoryHandler(srv *memory.Server, handler EchoHandler) error {
 	desc := DRPCEchoDescription{}
 
+	// Wrap the ORB handler with our adapter to make it compatible with DRPC.
+	drpcHandler := &orbDRPCEchoHandler{handler: handler}
+
 	// Register with the server/drpc(.Mux).
-	err := srv.Router().Register(handler, desc)
+	err := srv.Router().Register(drpcHandler, desc)
 	if err != nil {
 		return err
 	}
@@ -91,7 +165,7 @@ func RegisterEchoHandler(handler any) server.RegistrationFunc {
 		switch srv := s.(type) {
 
 		case grpc.ServiceRegistrar:
-			registerEchoGRPCHandler(srv, handler.(EchoServer))
+			registerEchoGRPCServerHandler(srv, handler.(EchoHandler))
 		case *mdrpc.Server:
 			registerEchoDRPCHandler(srv, handler.(EchoHandler))
 		case *memory.Server:

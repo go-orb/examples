@@ -2,13 +2,12 @@
 package main
 
 import (
-	"context"
-	"os/signal"
-	"syscall"
+	"fmt"
+	"os"
 
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/server"
-	"github.com/go-orb/go-orb/types"
 
 	authHandler "github.com/go-orb/examples/rest/auth/handler/auth"
 	authV1Proto "github.com/go-orb/examples/rest/auth/proto/auth_v1"
@@ -17,15 +16,13 @@ import (
 
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
+	_ "github.com/go-orb/plugins/codecs/yaml"
+	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
 
 	_ "github.com/go-orb/plugins-experimental/registry/mdns"
+	_ "github.com/go-orb/plugins/registry/consul"
 )
-
-// provideLoggerOpts returns the logger options.
-func provideLoggerOpts() ([]log.Option, error) {
-	return []log.Option{log.WithLevel("TRACE")}, nil
-}
 
 // provideServerOpts provides options for the go-orb server.
 //
@@ -59,31 +56,43 @@ func provideServerConfigured(logger log.Logger, srv server.Server) (serverConfig
 }
 
 func runner(
-	ctx context.Context,
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
+	svcCtx *cli.ServiceContext,
 	logger log.Logger,
 ) error {
-	logger.Info("Started", "name", serviceName, "version", serviceVersion)
+	logger.Info("Started", "name", svcCtx.Name(), "version", svcCtx.Version())
 
 	// Blocks until the process receives a signal.
-	<-ctx.Done()
+	<-svcCtx.Context().Done()
 
-	logger.Info("Stopping", "name", serviceName, "version", serviceVersion)
+	logger.Info("Stopping", "name", svcCtx.Name(), "version", svcCtx.Version())
 
 	return nil
 }
 
 func main() {
-	var (
-		serviceName    = types.ServiceName("orb.examples.rest.auth.server")
-		serviceVersion = types.ServiceVersion("v0.0.1")
-	)
+	app := cli.App{
+		Name:     "orb.examples.rest.middleware.server",
+		Version:  "",
+		Usage:    "An example app",
+		NoAction: false,
+		Flags: []*cli.Flag{
+			{
+				Name:        "log_level",
+				Default:     "INFO",
+				EnvVars:     []string{"LOG_LEVEL"},
+				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
+			},
+		},
+		Commands: []*cli.Command{},
+	}
 
-	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer cancel()
+	appContext := cli.NewAppContext(&app)
 
-	if _, err := run(ctx, serviceName, serviceVersion, runner); err != nil {
-		log.Error("while running", "err", err)
+	_, err := run(appContext, os.Args, runner)
+	if err != nil {
+		//nolint:forbidigo
+		fmt.Printf("run error: %s\n", err)
+		os.Exit(1)
 	}
 }

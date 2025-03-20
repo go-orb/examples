@@ -70,12 +70,11 @@ func run(
 		urfave.ProvideParser,
 		cli.ProvideParsedFlagsFromArgs,
 
+		cli.ProvideAppConfigData,
+		cli.ProvideServiceConfigData,
+
 		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
-
-		cli.ProvideConfigData,
-		cli.ProvideServiceName,
-		cli.ProvideServiceVersion,
 
 		log.ProvideNoOpts,
 		registry.ProvideNoOpts,

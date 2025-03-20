@@ -44,7 +44,7 @@ func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceName, err := cli.ProvideServiceName(serviceContext)
+	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -56,19 +56,15 @@ func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	configData, err := cli.ProvideConfigData(serviceContext, v2)
+	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v2)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	logger, err := log.ProvideNoOpts(serviceName, configData, v)
+	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceVersion, err := cli.ProvideServiceVersion(serviceContext)
-	if err != nil {
-		return wireRunResult{}, err
-	}
-	registryType, err := registry.ProvideNoOpts(serviceName, serviceVersion, configData, v, logger)
+	registryType, err := registry.ProvideNoOpts(serviceContext, v, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -76,7 +72,7 @@ func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serverServer, err := server.Provide(serviceName, configData, v, logger, registryType, v3...)
+	serverServer, err := server.Provide(serviceContext, v, logger, registryType, v3...)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -106,14 +102,6 @@ func provideServerOpts(logger log.Logger) ([]server.ConfigOption, error) {
 // wireRunResult is here so "wire" has a type for the return value of wireRun.
 // wire needs a explicit type for each provider including "wireRun".
 type wireRunResult struct{}
-
-// wireRunCallback is the actual code that runs the business logic.
-type wireRunCallback func(
-	ctx context.Context,
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
-	logger log.Logger,
-) error
 
 func wireRun(
 	serviceContext *cli.ServiceContext,

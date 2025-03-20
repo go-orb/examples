@@ -20,7 +20,11 @@ func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (Runner, error
 	if err != nil {
 		return nil, err
 	}
-	runner, err := service.ProvideRunner(appContext, flags)
+	appConfigData, err := cli.ProvideAppConfigData(appContext)
+	if err != nil {
+		return nil, err
+	}
+	runner, err := service.ProvideRunner(appContext, appConfigData, flags)
 	if err != nil {
 		return nil, err
 	}

@@ -74,10 +74,10 @@ func run(
 		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
 
-		cli.ProvideConfigData,
-		cli.ProvideServiceName,
+		cli.ProvideAppConfigData,
+		cli.ProvideServiceConfigData,
 
-		log.ProvideNoOpts,
+		log.ProvideWithServiceNameField,
 
 		event.ProvideNoOpts,
 

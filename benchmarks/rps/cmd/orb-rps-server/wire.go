@@ -126,9 +126,8 @@ func run(
 		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
 
-		cli.ProvideConfigData,
-		cli.ProvideServiceName,
-		cli.ProvideServiceVersion,
+		cli.ProvideAppConfigData,
+		cli.ProvideServiceConfigData,
 
 		log.ProvideNoOpts,
 		registry.ProvideNoOpts,

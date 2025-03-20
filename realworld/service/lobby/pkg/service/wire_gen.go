@@ -22,7 +22,7 @@ import (
 // Injectors from wire.go:
 
 // ProvideRunner provides a runner for the service.
-func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (Runner, error) {
+func ProvideRunner(appContext *cli.AppContext, appConfigData cli.AppConfigData, flags []*cli.Flag) (Runner, error) {
 	serviceContext, err := provideServiceContext(appContext)
 	if err != nil {
 		return nil, err
@@ -31,31 +31,23 @@ func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (Runner, error
 	if err != nil {
 		return nil, err
 	}
-	serviceName, err := cli.ProvideServiceName(serviceContext)
+	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, flags)
 	if err != nil {
 		return nil, err
 	}
-	configData, err := cli.ProvideConfigData(serviceContext, flags)
+	logger, err := log.ProvideWithServiceNameField(serviceContextHasConfigData, serviceContext, v)
 	if err != nil {
 		return nil, err
 	}
-	logger, err := log.ProvideWithServiceNameField(serviceName, configData, v)
+	registryType, err := registry.ProvideNoOpts(serviceContext, v, logger)
 	if err != nil {
 		return nil, err
 	}
-	serviceVersion, err := cli.ProvideServiceVersion(serviceContext)
+	serverServer, err := server.ProvideNoOpts(serviceContext, v, logger, registryType)
 	if err != nil {
 		return nil, err
 	}
-	registryType, err := registry.ProvideNoOpts(serviceName, serviceVersion, configData, v, logger)
-	if err != nil {
-		return nil, err
-	}
-	serverServer, err := server.ProvideNoOpts(serviceName, configData, v, logger, registryType)
-	if err != nil {
-		return nil, err
-	}
-	clientType, err := client.ProvideNoOpts(serviceName, configData, v, logger, registryType)
+	clientType, err := client.ProvideNoOpts(serviceContext, v, logger, registryType)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +55,7 @@ func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (Runner, error
 	if err != nil {
 		return nil, err
 	}
-	handlerHandler, err := handler.Provide(serviceName, logger, clientType, serviceClient, serverServer)
+	handlerHandler, err := handler.Provide(serviceContext, logger, clientType, serviceClient, serverServer)
 	if err != nil {
 		return nil, err
 	}

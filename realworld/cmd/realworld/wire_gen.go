@@ -15,6 +15,7 @@ import (
 import (
 	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/client/middleware/log"
+	_ "github.com/go-orb/plugins/client/middleware/retry"
 	_ "github.com/go-orb/plugins/client/orb"
 	_ "github.com/go-orb/plugins/client/orb_transport/grpc"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
@@ -29,6 +30,10 @@ import (
 // Injectors from wire.go:
 
 func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
+	appConfigData, err := cli.ProvideAppConfigData(appContext)
+	if err != nil {
+		return wireRunResult{}, err
+	}
 	parserFunc, err := urfave.ProvideParser()
 	if err != nil {
 		return wireRunResult{}, err
@@ -37,11 +42,11 @@ func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	runner, err := monolith.ProvideRunner(appContext, v)
+	runner, err := monolith.ProvideRunner(appContext, appConfigData, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(appContext, runner)
+	mainWireRunResult, err := wireRun(appContext, appConfigData, runner)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -54,6 +59,7 @@ type wireRunResult struct{}
 
 func wireRun(
 	appContext *cli.AppContext,
+	appConfigData cli.AppConfigData,
 	monolithRunner monolith.Runner,
 ) (wireRunResult, error) {
 	return wireRunResult{}, monolithRunner()

@@ -28,7 +28,7 @@ func ProvideClient(clientWire client.Type) (*httpgateway.Client, error) {
 }
 
 // ProvideRunner provides the httpgateway runner.
-func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (httpgatewayservice.Runner, error) {
+func ProvideRunner(appContext *cli.AppContext, appConfigData cli.AppConfigData, flags []*cli.Flag) (httpgatewayservice.Runner, error) {
 	panic(wire.Build(
 		provideServiceContext,
 		httpgatewayservice.ProvideRunner,

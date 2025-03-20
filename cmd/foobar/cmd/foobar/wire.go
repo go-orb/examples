@@ -42,6 +42,8 @@ func run(
 		urfave.ProvideParser,
 		cli.ProvideParsedFlagsFromArgs,
 
+		cli.ProvideAppConfigData,
+
 		service1.ProvideRunner,
 		monolith.ProvideRunner,
 

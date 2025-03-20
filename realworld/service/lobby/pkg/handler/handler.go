@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	lobby_v1 "github.com/go-orb/examples/realworld/service/lobby/proto/lobby_v1"
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/server"
@@ -76,9 +77,9 @@ func (h *Handler) ListGames(_ context.Context, _ *emptypb.Empty) (*lobby_v1.List
 }
 
 // New creates a new Handler.
-func New(serviceName string, logger log.Logger, client client.Type, hgClient *httpgateway.Client, server server.Server) *Handler {
+func New(svcCtx *cli.ServiceContext, logger log.Logger, client client.Type, hgClient *httpgateway.Client, server server.Server) *Handler {
 	return &Handler{
-		serviceName: serviceName,
+		serviceName: svcCtx.Name(),
 		logger:      logger,
 		client:      client,
 		hgClient:    hgClient,
@@ -88,13 +89,13 @@ func New(serviceName string, logger log.Logger, client client.Type, hgClient *ht
 
 // Provide provides a handler to wire.
 func Provide(
-	sn types.ServiceName,
+	svcCtx *cli.ServiceContext,
 	logger log.Logger,
 	client client.Type,
 	hgClient *httpgateway.Client,
 	server server.Server,
 ) (*Handler, error) {
-	handler := New(string(sn), logger, client, hgClient, server)
+	handler := New(svcCtx, logger, client, hgClient, server)
 
 	return handler, nil
 }

@@ -94,15 +94,14 @@ func provideRunner(actionServer ActionServer, actionHealth ActionHealth) (Runner
 // ProvideRunner provides a runner for the service.
 func ProvideRunner(
 	appContext *cli.AppContext,
+	appConfigData cli.AppConfigData,
 	flags []*cli.Flag,
 ) (Runner, error) {
 	panic(wire.Build(
 		provideServiceContext,
 		types.ProvideComponents,
 
-		cli.ProvideConfigData,
-		cli.ProvideServiceName,
-		cli.ProvideServiceVersion,
+		cli.ProvideServiceConfigData,
 
 		log.ProvideWithServiceNameField,
 

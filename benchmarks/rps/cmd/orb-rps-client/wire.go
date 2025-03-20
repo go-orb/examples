@@ -67,7 +67,7 @@ func wireRun(
 	return wireRunResult{}, runErr
 }
 
-func provideClientConfig(serviceName types.ServiceName, configs types.ConfigData) (*clientConfig, error) {
+func provideClientConfig(svcCtx *cli.ServiceContext) (*clientConfig, error) {
 	cfg := &clientConfig{
 		BypassRegistry: defaultBypassRegistry,
 		PoolSize:       defaultPoolSize,
@@ -80,7 +80,7 @@ func provideClientConfig(serviceName types.ServiceName, configs types.ConfigData
 		ContentType:    defaultContentType,
 	}
 
-	if err := config.Parse([]string{configSection}, configs, &cfg); err != nil {
+	if err := config.Parse(nil, configSection, svcCtx.Config, &cfg); err != nil {
 		return nil, err
 	}
 
@@ -103,9 +103,8 @@ func run(
 		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
 
-		cli.ProvideConfigData,
-		cli.ProvideServiceName,
-		cli.ProvideServiceVersion,
+		cli.ProvideAppConfigData,
+		cli.ProvideServiceConfigData,
 
 		log.ProvideNoOpts,
 

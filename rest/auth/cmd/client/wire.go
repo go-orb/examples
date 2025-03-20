@@ -7,10 +7,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/types"
+	"github.com/go-orb/plugins/cli/urfave"
 	"github.com/go-orb/wire"
 )
 
@@ -20,13 +22,13 @@ type wireRunResult string
 
 // wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
-	ctx context.Context,
+	serviceContext *cli.ServiceContext,
 	logger log.Logger,
 	client client.Type,
 ) error
 
 func wireRun(
-	ctx context.Context,
+	serviceContext *cli.ServiceContext,
 	logger log.Logger,
 	client client.Type,
 	components *types.Components,
@@ -34,7 +36,7 @@ func wireRun(
 ) (wireRunResult, error) {
 	// Orb start
 	for _, c := range components.Iterate(false) {
-		err := c.Start(ctx)
+		err := c.Start(serviceContext.Context())
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 			return "", err
@@ -43,10 +45,10 @@ func wireRun(
 
 	//
 	// Actual code
-	runErr := cb(ctx, logger, client)
+	runErr := cb(serviceContext, logger, client)
 
 	// Orb shutdown.
-	ctx = context.Background()
+	ctx := context.Background()
 
 	for _, c := range components.Iterate(true) {
 		err := c.Stop(ctx)
@@ -58,21 +60,26 @@ func wireRun(
 	return "", runErr
 }
 
-// run combines everything above and
 func run(
-	ctx context.Context,
-	serviceName types.ServiceName,
-	serviceVersion types.ServiceVersion,
+	appContext *cli.AppContext,
+	args []string,
 	cb wireRunCallback,
 ) (wireRunResult, error) {
 	panic(wire.Build(
+		urfave.ProvideParser,
+		cli.ProvideParsedFlagsFromArgs,
+
+		cli.ProvideAppConfigData,
+		cli.ProvideServiceConfigData,
+
+		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
-		wire.Value(types.ConfigData{}),
-		provideLoggerOpts,
-		log.Provide,
+
+		log.ProvideNoOpts,
 		registry.ProvideNoOpts,
-		provideClientOpts,
-		client.Provide,
+
+		client.ProvideNoOpts,
+
 		wireRun,
 	))
 }

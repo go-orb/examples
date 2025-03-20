@@ -15,7 +15,7 @@ import (
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
 	"github.com/go-orb/plugins/cli/urfave"
-	"github.com/google/uuid"
+	"github.com/lithammer/shortuuid/v3"
 )
 
 import (
@@ -36,7 +36,7 @@ func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceName, err := cli.ProvideServiceName(serviceContext)
+	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -48,15 +48,15 @@ func run(appContext *cli.AppContext, args []string) (wireRunResult, error) {
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	configData, err := cli.ProvideConfigData(serviceContext, v2)
+	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v2)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	logger, err := log.ProvideNoOpts(serviceName, configData, v)
+	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	eventType, err := event.ProvideNoOpts(serviceName, configData, v, logger)
+	eventType, err := event.ProvideNoOpts(serviceContext, v, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -90,7 +90,7 @@ func wireRun(
 	}
 
 	userNewHandler := func(_ context.Context, req *user_new.Request) (*user_new.Resp, error) {
-		return &user_new.Resp{Name: req.GetName(), Uuid: uuid.New().String()}, nil
+		return &user_new.Resp{Name: req.GetName(), Uuid: shortuuid.New()}, nil
 	}
 	event.HandleRequest(serviceContext.Context(), eventHandler, "user.new", userNewHandler)
 

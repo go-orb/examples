@@ -17,7 +17,7 @@ import (
 // Injectors from wire.go:
 
 // ProvideRunner provides a runner for the service.
-func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (Runner, error) {
+func ProvideRunner(appContext *cli.AppContext, appConfigData cli.AppConfigData, flags []*cli.Flag) (Runner, error) {
 	serviceContext, err := provideServiceContext(appContext)
 	if err != nil {
 		return nil, err
@@ -26,16 +26,11 @@ func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (Runner, error
 	if err != nil {
 		return nil, err
 	}
-	serviceName, err := cli.ProvideServiceName(serviceContext)
+	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, flags)
 	if err != nil {
 		return nil, err
 	}
-	configData, err := cli.ProvideConfigData(serviceContext, flags)
-	if err != nil {
-		return nil, err
-	}
-	v2 := _wireValue
-	logger, err := log.Provide(serviceName, configData, v, v2...)
+	logger, err := log.ProvideWithServiceNameField(serviceContextHasConfigData, serviceContext, v)
 	if err != nil {
 		return nil, err
 	}
@@ -53,10 +48,6 @@ func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (Runner, error
 	}
 	return runner, nil
 }
-
-var (
-	_wireValue = []log.Option{}
-)
 
 // wire.go:
 

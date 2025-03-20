@@ -17,12 +17,12 @@ import (
 // Injectors from wire.go:
 
 // ProvideRunner provides a runner for the service.
-func ProvideRunner(appContext *cli.AppContext, flags []*cli.Flag) (Runner, error) {
-	runner, err := serviceproxy.ProvideRunner(appContext, flags)
+func ProvideRunner(appContext *cli.AppContext, appConfigData cli.AppConfigData, flags []*cli.Flag) (Runner, error) {
+	runner, err := serviceproxy.ProvideRunner(appContext, appConfigData, flags)
 	if err != nil {
 		return nil, err
 	}
-	serviceRunner, err := service.ProvideRunner(appContext, flags)
+	serviceRunner, err := service.ProvideRunner(appContext, appConfigData, flags)
 	if err != nil {
 		return nil, err
 	}

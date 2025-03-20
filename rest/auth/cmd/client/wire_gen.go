@@ -9,10 +9,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/registry"
 	"github.com/go-orb/go-orb/types"
+	"github.com/go-orb/plugins/cli/urfave"
 )
 
 import (
@@ -22,48 +24,57 @@ import (
 	_ "github.com/go-orb/plugins/client/orb_transport/drpc"
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
+	_ "github.com/go-orb/plugins/codecs/yaml"
+	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
+	_ "github.com/go-orb/plugins/registry/consul"
 )
 
 // Injectors from wire.go:
 
-// run combines everything above and
-func run(ctx context.Context, serviceName types.ServiceName, serviceVersion types.ServiceVersion, cb wireRunCallback) (wireRunResult, error) {
-	configData := _wireConfigDataValue
-	v, err := types.ProvideComponents()
+func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRunResult, error) {
+	serviceContext, err := cli.ProvideSingleServiceContext(appContext)
 	if err != nil {
 		return "", err
 	}
-	v2, err := provideLoggerOpts()
+	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return "", err
 	}
-	logger, err := log.Provide(serviceName, configData, v, v2...)
+	parserFunc, err := urfave.ProvideParser()
 	if err != nil {
 		return "", err
 	}
-	registryType, err := registry.ProvideNoOpts(serviceName, serviceVersion, configData, v, logger)
+	v, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
 	if err != nil {
 		return "", err
 	}
-	v3, err := provideClientOpts()
+	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v)
 	if err != nil {
 		return "", err
 	}
-	clientType, err := client.Provide(serviceName, configData, v, logger, registryType, v3...)
+	v2, err := types.ProvideComponents()
 	if err != nil {
 		return "", err
 	}
-	mainWireRunResult, err := wireRun(ctx, logger, clientType, v, cb)
+	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v2)
+	if err != nil {
+		return "", err
+	}
+	registryType, err := registry.ProvideNoOpts(serviceContext, v2, logger)
+	if err != nil {
+		return "", err
+	}
+	clientType, err := client.ProvideNoOpts(serviceContext, v2, logger, registryType)
+	if err != nil {
+		return "", err
+	}
+	mainWireRunResult, err := wireRun(serviceContext, logger, clientType, v2, cb)
 	if err != nil {
 		return "", err
 	}
 	return mainWireRunResult, nil
 }
-
-var (
-	_wireConfigDataValue = types.ConfigData{}
-)
 
 // wire.go:
 
@@ -73,13 +84,13 @@ type wireRunResult string
 
 // wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
-	ctx context.Context,
+	serviceContext *cli.ServiceContext,
 	logger log.Logger, client2 client.Type,
 
 ) error
 
 func wireRun(
-	ctx context.Context,
+	serviceContext *cli.ServiceContext,
 	logger log.Logger, client2 client.Type,
 
 	components *types.Components,
@@ -87,16 +98,16 @@ func wireRun(
 ) (wireRunResult, error) {
 
 	for _, c := range components.Iterate(false) {
-		err := c.Start(ctx)
+		err := c.Start(serviceContext.Context())
 		if err != nil {
 			logger.Error("Failed to start", "error", err, "component", fmt.Sprintf("%s/%s", c.Type(), c.String()))
 			return "", err
 		}
 	}
 
-	runErr := cb(ctx, logger, client2)
+	runErr := cb(serviceContext, logger, client2)
 
-	ctx = context.Background()
+	ctx := context.Background()
 
 	for _, c := range components.Iterate(true) {
 		err := c.Stop(ctx)

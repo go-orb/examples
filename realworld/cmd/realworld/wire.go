@@ -15,6 +15,7 @@ type wireRunResult struct{}
 
 func wireRun(
 	appContext *cli.AppContext,
+	appConfigData cli.AppConfigData,
 	monolithRunner monolith.Runner,
 ) (wireRunResult, error) {
 	return wireRunResult{}, monolithRunner()
@@ -27,6 +28,8 @@ func run(
 	panic(wire.Build(
 		urfave.ProvideParser,
 		cli.ProvideParsedFlagsFromArgs,
+
+		cli.ProvideAppConfigData,
 
 		monolith.ProvideRunner,
 

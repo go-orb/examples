@@ -14,7 +14,7 @@ import (
 	"github.com/go-orb/go-orb/types"
 	"github.com/go-orb/plugins/cli/urfave"
 	"github.com/go-orb/wire"
-	"github.com/lithammer/shortuuid"
+	"github.com/lithammer/shortuuid/v3"
 )
 
 // wireRunResult is here so "wire" has a type for the return value of wireRun.
@@ -73,8 +73,8 @@ func run(
 		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
 
-		cli.ProvideConfigData,
-		cli.ProvideServiceName,
+		cli.ProvideAppConfigData,
+		cli.ProvideServiceConfigData,
 
 		log.ProvideNoOpts,
 

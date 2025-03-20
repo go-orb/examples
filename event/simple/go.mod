@@ -11,6 +11,7 @@ require (
 	github.com/go-orb/plugins/log/slog v0.1.1-0.20250311055558-8297a94ff1c7
 	github.com/go-orb/wire v0.7.0
 	github.com/google/uuid v1.6.0
+	github.com/lithammer/shortuuid/v3 v3.0.7
 	google.golang.org/protobuf v1.36.5
 )
 

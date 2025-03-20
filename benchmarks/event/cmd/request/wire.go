@@ -22,16 +22,13 @@ type wireRunResult struct{}
 
 // wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
-	ctx context.Context,
-	serviceName types.ServiceName,
-	configs types.ConfigData,
+	svcCtx *cli.ServiceContext,
 	logger log.Logger,
 	eventHandler event.Type,
 ) error
 
 func wireRun(
-	serviceName types.ServiceName,
-	configs types.ConfigData,
+	serviceContext *cli.ServiceContext,
 	components *types.Components,
 	logger log.Logger,
 	event event.Type,
@@ -49,9 +46,8 @@ func wireRun(
 		}
 	}
 
-	//
 	// Actual code
-	runErr := cb(ctx, serviceName, configs, logger, event)
+	runErr := cb(serviceContext, logger, event)
 
 	// Orb shutdown.
 	ctx = context.Background()
@@ -78,8 +74,8 @@ func run(
 		cli.ProvideSingleServiceContext,
 		types.ProvideComponents,
 
-		cli.ProvideConfigData,
-		cli.ProvideServiceName,
+		cli.ProvideAppConfigData,
+		cli.ProvideServiceConfigData,
 
 		log.ProvideNoOpts,
 
