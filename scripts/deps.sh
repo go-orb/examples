@@ -112,6 +112,7 @@ function upgrade_specific() {
 			continue
 		fi
 
+		echo "Updating ${pkg}"
 		update_deps "${pkg%go.mod}" "0"
 	done < <(echo "${1}" | tr "," "\n")
 }

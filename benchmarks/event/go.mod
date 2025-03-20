@@ -3,18 +3,19 @@ module github.com/go-orb/examples/benchmarks/event
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.2.2-0.20250311024506-e44d2eb21aa9
-	github.com/go-orb/plugins/cli/urfave v0.0.0-20250311055558-8297a94ff1c7
-	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250311055558-8297a94ff1c7
-	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250311055558-8297a94ff1c7
-	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250311055558-8297a94ff1c7
-	github.com/go-orb/plugins/event/natsjs v0.1.1-0.20250311055558-8297a94ff1c7
-	github.com/go-orb/plugins/log/slog v0.1.1-0.20250311055558-8297a94ff1c7
+	github.com/go-orb/go-orb v0.2.2-0.20250320211814-c5e283ade629
+	github.com/go-orb/plugins/cli/urfave v0.0.0-20250320212435-efb51edcf7be
+	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250320212435-efb51edcf7be
+	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250320212435-efb51edcf7be
+	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250320212435-efb51edcf7be
+	github.com/go-orb/plugins/event/natsjs v0.1.1-0.20250320212435-efb51edcf7be
+	github.com/go-orb/plugins/log/slog v0.1.1-0.20250320212435-efb51edcf7be
 	github.com/go-orb/wire v0.7.0
 	google.golang.org/protobuf v1.36.5
 )
 
 require (
+	dario.cat/mergo v1.0.1 // indirect
 	github.com/cornelk/hashmap v1.0.8 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
@@ -22,6 +23,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/nats-io/nats.go v1.39.1 // indirect
 	github.com/nats-io/nkeys v0.4.10 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
