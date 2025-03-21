@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -80,7 +81,7 @@ func provideClientConfig(svcCtx *cli.ServiceContext) (*clientConfig, error) {
 		ContentType:    defaultContentType,
 	}
 
-	if err := config.Parse(nil, configSection, svcCtx.Config, &cfg); err != nil {
+	if err := config.Parse(nil, configSection, svcCtx.Config, &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
 		return nil, err
 	}
 

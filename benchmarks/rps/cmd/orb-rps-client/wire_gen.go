@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/client"
@@ -146,7 +147,7 @@ func provideClientConfig(svcCtx *cli.ServiceContext) (*clientConfig, error) {
 		ContentType:    defaultContentType,
 	}
 
-	if err := config.Parse(nil, configSection, svcCtx.Config, &cfg); err != nil {
+	if err := config.Parse(nil, configSection, svcCtx.Config, &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
 		return nil, err
 	}
 

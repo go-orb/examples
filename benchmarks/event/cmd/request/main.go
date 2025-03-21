@@ -107,7 +107,7 @@ func bench(
 		PackageSize: defaultPackageSize,
 	}
 
-	if err := config.Parse(nil, event.DefaultConfigSection, svcCtx.Config, &cfg); err != nil {
+	if err := config.Parse(nil, event.DefaultConfigSection, svcCtx.Config, &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
 		return err
 	}
 
