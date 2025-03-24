@@ -30,9 +30,7 @@ import (
 func provideServerOpts() ([]server.ConfigOption, error) {
 	opts := []server.ConfigOption{}
 
-	opts = append(opts, server.WithEntrypointConfig(mdrpc.NewConfig(
-		mdrpc.WithName("drpc"),
-	)))
+	opts = append(opts, server.WithEntrypointConfig("drpc", mdrpc.NewConfig()))
 
 	return opts, nil
 }

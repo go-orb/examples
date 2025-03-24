@@ -33,44 +33,36 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 	hRegister := proto.RegisterEchoHandler(hInstance)
 
 	opts := []server.ConfigOption{}
-	opts = append(opts, server.WithEntrypointConfig(mgrpc.NewConfig(
-		mgrpc.WithName("grpc"),
+	opts = append(opts, server.WithEntrypointConfig("grpc", mgrpc.NewConfig(
 		mgrpc.WithInsecure(),
 		mgrpc.WithHandlers(hRegister),
 		mgrpc.WithReflection(true),
 	)))
-	opts = append(opts, server.WithEntrypointConfig(mgrpc.NewConfig(
-		mgrpc.WithName("grpcs"),
+	opts = append(opts, server.WithEntrypointConfig("grpcs", mgrpc.NewConfig(
 		mgrpc.WithHandlers(hRegister),
 		mgrpc.WithReflection(true),
 	)))
-	opts = append(opts, server.WithEntrypointConfig(mhttp.NewConfig(
-		mhttp.WithName("http"),
+	opts = append(opts, server.WithEntrypointConfig("http", mhttp.NewConfig(
 		mhttp.WithInsecure(),
 		mhttp.WithHandlers(hRegister),
 	)))
-	opts = append(opts, server.WithEntrypointConfig(mhttp.NewConfig(
-		mhttp.WithName("https"),
+	opts = append(opts, server.WithEntrypointConfig("https", mhttp.NewConfig(
 		mhttp.WithDisableHTTP2(),
 		mhttp.WithHandlers(hRegister),
 	)))
-	opts = append(opts, server.WithEntrypointConfig(mhttp.NewConfig(
-		mhttp.WithName("h2c"),
+	opts = append(opts, server.WithEntrypointConfig("h2c", mhttp.NewConfig(
 		mhttp.WithInsecure(),
 		mhttp.WithAllowH2C(),
 		mhttp.WithHandlers(hRegister),
 	)))
-	opts = append(opts, server.WithEntrypointConfig(mhttp.NewConfig(
-		mhttp.WithName("http2"),
+	opts = append(opts, server.WithEntrypointConfig("http2", mhttp.NewConfig(
 		mhttp.WithHandlers(hRegister),
 	)))
-	opts = append(opts, server.WithEntrypointConfig(mhttp.NewConfig(
-		mhttp.WithName("http3"),
+	opts = append(opts, server.WithEntrypointConfig("http3", mhttp.NewConfig(
 		mhttp.WithHTTP3(),
 		mhttp.WithHandlers(hRegister),
 	)))
-	opts = append(opts, server.WithEntrypointConfig(drpc.NewConfig(
-		drpc.WithName("drpc"),
+	opts = append(opts, server.WithEntrypointConfig("drpc", drpc.NewConfig(
 		drpc.WithHandlers(hRegister),
 	)))
 

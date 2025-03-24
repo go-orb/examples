@@ -92,14 +92,14 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 	hRegister := echo2.RegisterEchoHandler(hInstance)
 
 	opts := []server.ConfigOption{}
-	opts = append(opts, server.WithEntrypointConfig(grpc.NewConfig(grpc.WithName("grpc"), grpc.WithInsecure(), grpc.WithHandlers(hRegister), grpc.WithReflection(true))))
-	opts = append(opts, server.WithEntrypointConfig(grpc.NewConfig(grpc.WithName("grpcs"), grpc.WithHandlers(hRegister), grpc.WithReflection(true))))
-	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("http"), http.WithInsecure(), http.WithHandlers(hRegister))))
-	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("https"), http.WithDisableHTTP2(), http.WithHandlers(hRegister))))
-	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("h2c"), http.WithInsecure(), http.WithAllowH2C(), http.WithHandlers(hRegister))))
-	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("http2"), http.WithHandlers(hRegister))))
-	opts = append(opts, server.WithEntrypointConfig(http.NewConfig(http.WithName("http3"), http.WithHTTP3(), http.WithHandlers(hRegister))))
-	opts = append(opts, server.WithEntrypointConfig(drpc.NewConfig(drpc.WithName("drpc"), drpc.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("grpc", grpc.NewConfig(grpc.WithInsecure(), grpc.WithHandlers(hRegister), grpc.WithReflection(true))))
+	opts = append(opts, server.WithEntrypointConfig("grpcs", grpc.NewConfig(grpc.WithHandlers(hRegister), grpc.WithReflection(true))))
+	opts = append(opts, server.WithEntrypointConfig("http", http.NewConfig(http.WithInsecure(), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("https", http.NewConfig(http.WithDisableHTTP2(), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("h2c", http.NewConfig(http.WithInsecure(), http.WithAllowH2C(), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("http2", http.NewConfig(http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("http3", http.NewConfig(http.WithHTTP3(), http.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("drpc", drpc.NewConfig(drpc.WithHandlers(hRegister))))
 
 	return opts, nil
 }
