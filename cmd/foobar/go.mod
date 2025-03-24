@@ -3,17 +3,17 @@ module github.com/go-orb/examples/cmd/foobar
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.2.2-0.20250320211814-c5e283ade629
-	github.com/go-orb/plugins/cli/urfave v0.0.0-20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/client/orb v0.1.4-0.20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/log/slog v0.1.1-0.20250320212435-efb51edcf7be
-	github.com/go-orb/plugins/registry/memory v0.0.0-20250320212435-efb51edcf7be
+	github.com/go-orb/go-orb v0.2.2-0.20250324124045-3bdc9fe02ce0
+	github.com/go-orb/plugins/cli/urfave v0.0.0-20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/client/middleware/log v0.1.1-0.20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/client/orb v0.1.4-0.20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/client/orb_transport/grpc v0.0.0-20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/codecs/yaml v0.1.1-0.20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/config/source/file v0.1.1-0.20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/log/slog v0.1.1-0.20250324190622-29a1b5614fc6
+	github.com/go-orb/plugins/registry/memory v0.0.0-20250324190622-29a1b5614fc6
 	github.com/go-orb/wire v0.7.0
 )
 
@@ -33,6 +33,6 @@ require (
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4 // indirect
 	google.golang.org/grpc v1.71.0 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

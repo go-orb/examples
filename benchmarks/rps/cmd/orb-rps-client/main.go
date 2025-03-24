@@ -21,13 +21,13 @@ import (
 	echoproto "github.com/go-orb/examples/benchmarks/rps/proto/echo"
 
 	// Import required plugins.
-	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/client/orb"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
 	_ "github.com/go-orb/plugins/registry/consul"
+	_ "github.com/go-orb/plugins/registry/mdns"
 
 	// Transport plugins.
 	_ "github.com/go-orb/plugins/client/orb_transport/drpc"

@@ -23,7 +23,6 @@ import (
 )
 
 import (
-	_ "github.com/go-orb/plugins-experimental/registry/mdns"
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
 	_ "github.com/go-orb/plugins/codecs/yaml"
@@ -31,6 +30,7 @@ import (
 	_ "github.com/go-orb/plugins/log/lumberjack"
 	_ "github.com/go-orb/plugins/log/slog"
 	_ "github.com/go-orb/plugins/registry/consul"
+	_ "github.com/go-orb/plugins/registry/mdns"
 )
 
 // Injectors from wire.go:

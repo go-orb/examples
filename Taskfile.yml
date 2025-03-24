@@ -40,10 +40,18 @@ tasks:
     desc: "Run go generate ./... in all packages."
     cmds:
     - |
-      for i in $(find . -type d); do 
-        [[ ! -f $i/go.mod ]] && continue
-        pushd $i 1>/dev/null
+      for i in $(find . -name 'go.mod'); do
+        if [[ "$i" == "./.github/go.mod" ]]; then
+          continue
+        fi
+
+        pushd ${i:0:-6} 1>/dev/null
         echo $i
         go generate ./... || true
         popd 1>/dev/null
       done
+  
+  deps:
+    desc: Update dependencies on all changed packages to the latest git commit
+    cmds:
+      - cmd: GOSUMDB=off GOPROXY="direct" ./scripts/deps.sh main all
