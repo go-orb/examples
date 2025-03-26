@@ -49,7 +49,7 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return "", err
 	}
-	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v)
+	serviceContextWithConfig, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v)
 	if err != nil {
 		return "", err
 	}
@@ -57,15 +57,15 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return "", err
 	}
-	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v2)
+	logger, err := log.ProvideNoOpts(serviceContextWithConfig, v2)
 	if err != nil {
 		return "", err
 	}
-	registryType, err := registry.ProvideNoOpts(serviceContext, v2, logger)
+	registryType, err := registry.ProvideNoOpts(serviceContextWithConfig, v2, logger)
 	if err != nil {
 		return "", err
 	}
-	clientType, err := client.ProvideNoOpts(serviceContext, v2, logger, registryType)
+	clientType, err := client.ProvideNoOpts(serviceContextWithConfig, v2, logger, registryType)
 	if err != nil {
 		return "", err
 	}

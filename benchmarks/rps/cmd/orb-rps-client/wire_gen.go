@@ -27,6 +27,7 @@ import (
 	_ "github.com/go-orb/plugins/client/orb_transport/http"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
 	_ "github.com/go-orb/plugins/codecs/proto"
+	_ "github.com/go-orb/plugins/codecs/yaml"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
 	_ "github.com/go-orb/plugins/registry/consul"
@@ -40,14 +41,6 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	v, err := types.ProvideComponents()
-	if err != nil {
-		return wireRunResult{}, err
-	}
-	mainClientConfig, err := provideClientConfig(serviceContext)
-	if err != nil {
-		return wireRunResult{}, err
-	}
 	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return wireRunResult{}, err
@@ -56,19 +49,27 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	v2, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
+	v, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v2)
+	serviceContextWithConfig, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v)
+	v2, err := types.ProvideComponents()
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	registryType, err := registry.ProvideNoOpts(serviceContext, v, logger)
+	mainClientConfig, err := provideClientConfig(serviceContextWithConfig)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	logger, err := log.ProvideNoOpts(serviceContextWithConfig, v2)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	registryType, err := registry.ProvideNoOpts(serviceContextWithConfig, v2, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -76,11 +77,11 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	clientType, err := client.Provide(serviceContext, v, logger, registryType, v3...)
+	clientType, err := client.Provide(serviceContextWithConfig, v2, logger, registryType, v3...)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceContext, v, mainClientConfig, logger, clientType, cb)
+	mainWireRunResult, err := wireRun(serviceContextWithConfig, v2, mainClientConfig, logger, clientType, cb)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -100,7 +101,7 @@ type wireRunCallback func(
 type wireRunResult struct{}
 
 func wireRun(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	cfg *clientConfig,
 	logger log.Logger,
@@ -134,7 +135,7 @@ func wireRun(
 	return wireRunResult{}, runErr
 }
 
-func provideClientConfig(svcCtx *cli.ServiceContext) (*clientConfig, error) {
+func provideClientConfig(svcCtx *cli.ServiceContextWithConfig) (*clientConfig, error) {
 	cfg := &clientConfig{
 		BypassRegistry: defaultBypassRegistry,
 		PoolSize:       defaultPoolSize,
@@ -147,7 +148,7 @@ func provideClientConfig(svcCtx *cli.ServiceContext) (*clientConfig, error) {
 		ContentType:    defaultContentType,
 	}
 
-	if err := config.Parse(nil, configSection, svcCtx.Config, &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
+	if err := config.Parse(nil, configSection, svcCtx.Config(), &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
 		return nil, err
 	}
 

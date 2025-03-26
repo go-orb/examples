@@ -38,10 +38,6 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	v, err := types.ProvideComponents()
-	if err != nil {
-		return wireRunResult{}, err
-	}
 	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return wireRunResult{}, err
@@ -50,27 +46,31 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	v2, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
+	v, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v2)
+	serviceContextWithConfig, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	logger, err := log.ProvideNoOpts(serviceContextHasConfigData, serviceContext, v)
+	v2, err := types.ProvideComponents()
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	registryType, err := registry.ProvideNoOpts(serviceContext, v, logger)
+	logger, err := log.ProvideNoOpts(serviceContextWithConfig, v2)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	clientType, err := client.ProvideNoOpts(serviceContext, v, logger, registryType)
+	registryType, err := registry.ProvideNoOpts(serviceContextWithConfig, v2, logger)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceContext, v, logger, clientType, cb)
+	clientType, err := client.ProvideNoOpts(serviceContextWithConfig, v2, logger, registryType)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	mainWireRunResult, err := wireRun(serviceContextWithConfig, v2, logger, clientType, cb)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -88,7 +88,7 @@ type wireRunCallback func(
 ) error
 
 func wireRun(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 	clientWire client.Type,

@@ -22,13 +22,13 @@ type wireRunResult struct{}
 
 // wireRunCallback is the actual code that runs the business logic.
 type wireRunCallback func(
-	svcCtx *cli.ServiceContext,
+	svcCtx *cli.ServiceContextWithConfig,
 	logger log.Logger,
 	eventHandler event.Type,
 ) error
 
 func wireRun(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 	event event.Type,

@@ -95,7 +95,7 @@ func connection(
 //
 //nolint:funlen
 func bench(
-	svcCtx *cli.ServiceContext,
+	svcCtx *cli.ServiceContextWithConfig,
 	logger log.Logger,
 	eventHandler event.Type,
 ) error {
@@ -107,7 +107,7 @@ func bench(
 		PackageSize: defaultPackageSize,
 	}
 
-	if err := config.Parse(nil, event.DefaultConfigSection, svcCtx.Config, &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
+	if err := config.Parse(nil, event.DefaultConfigSection, svcCtx.Config(), &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
 		return err
 	}
 
@@ -225,7 +225,7 @@ func main() {
 				Name:        "log_level",
 				Default:     "INFO",
 				EnvVars:     []string{"LOG_LEVEL"},
-				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				ConfigPaths: [][]string{{configSection, "logLevel"}},
 				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
 			},
 		},

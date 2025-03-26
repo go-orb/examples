@@ -32,7 +32,7 @@ type wireRunCallback func(
 type wireRunResult struct{}
 
 func wireRun(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	cfg *clientConfig,
 	logger log.Logger,
@@ -68,7 +68,7 @@ func wireRun(
 	return wireRunResult{}, runErr
 }
 
-func provideClientConfig(svcCtx *cli.ServiceContext) (*clientConfig, error) {
+func provideClientConfig(svcCtx *cli.ServiceContextWithConfig) (*clientConfig, error) {
 	cfg := &clientConfig{
 		BypassRegistry: defaultBypassRegistry,
 		PoolSize:       defaultPoolSize,
@@ -81,7 +81,7 @@ func provideClientConfig(svcCtx *cli.ServiceContext) (*clientConfig, error) {
 		ContentType:    defaultContentType,
 	}
 
-	if err := config.Parse(nil, configSection, svcCtx.Config, &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
+	if err := config.Parse(nil, configSection, svcCtx.Config(), &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
 		return nil, err
 	}
 

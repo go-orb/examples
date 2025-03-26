@@ -22,19 +22,19 @@ func ProvideRunner(appContext *cli.AppContext, appConfigData cli.AppConfigData, 
 	if err != nil {
 		return nil, err
 	}
+	serviceContextWithConfig, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, flags)
+	if err != nil {
+		return nil, err
+	}
 	v, err := types.ProvideComponents()
 	if err != nil {
 		return nil, err
 	}
-	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, flags)
+	logger, err := log.ProvideWithServiceNameField(serviceContextWithConfig, v)
 	if err != nil {
 		return nil, err
 	}
-	logger, err := log.ProvideWithServiceNameField(serviceContextHasConfigData, serviceContext, v)
-	if err != nil {
-		return nil, err
-	}
-	actionServer, err := provideActionServer(serviceContext, v, logger)
+	actionServer, err := provideActionServer(serviceContextWithConfig, v, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func provideServiceContext(appContext *cli.AppContext) (*cli.ServiceContext, err
 }
 
 func provideActionServer(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 ) (ActionServer, error) {

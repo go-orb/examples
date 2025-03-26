@@ -24,6 +24,7 @@ import (
 	_ "github.com/go-orb/plugins/client/orb"
 	_ "github.com/go-orb/plugins/codecs/goccyjson"
 	_ "github.com/go-orb/plugins/codecs/proto"
+	_ "github.com/go-orb/plugins/codecs/yaml"
 	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/log/slog"
 	_ "github.com/go-orb/plugins/registry/consul"
@@ -214,14 +215,14 @@ func main() {
 				Name:        "registry",
 				Default:     registry.DefaultRegistry,
 				EnvVars:     []string{"REGISTRY"},
-				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"registry", "plugin"}}},
+				ConfigPaths: [][]string{{"registry", "plugin"}},
 				Usage:       "Set the registry plugin, one of mdns, consul, memory",
 			},
 			{
 				Name:        "log_level",
 				Default:     "INFO",
 				EnvVars:     []string{"LOG_LEVEL"},
-				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				ConfigPaths: [][]string{{"logger", "level"}},
 				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
 			},
 		},

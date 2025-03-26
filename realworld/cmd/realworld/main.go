@@ -37,21 +37,20 @@ func main() {
 				Name:        "log_level",
 				Default:     "INFO",
 				EnvVars:     []string{"LOG_LEVEL"},
-				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				ConfigPaths: [][]string{{"logger", "level"}},
 				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
 			},
 			{
 				Name:        "registry",
 				Default:     "mdns",
 				EnvVars:     []string{"REGISTRY"},
-				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"registry", "plugin"}}},
+				ConfigPaths: [][]string{{"registry", "plugin"}},
 				Usage:       "Set the registry plugin, one of mdns, consul, memory",
 			},
 		},
 		Commands: []*cli.Command{},
 
-		MultiServiceConfig: true,
-		HardcodedConfigs:   []cli.HardcodedConfig{{Format: "yaml", Data: config}},
+		HardcodedConfigs: []cli.HardcodedConfig{{Format: "yaml", Data: config}},
 	}
 
 	app.Commands = append(app.Commands, monolith.MainCommands()...)

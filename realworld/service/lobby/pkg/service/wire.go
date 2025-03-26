@@ -29,7 +29,7 @@ func provideServiceContext(appContext *cli.AppContext) (*cli.ServiceContext, err
 }
 
 func provideActionServer(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 	_ server.Server,

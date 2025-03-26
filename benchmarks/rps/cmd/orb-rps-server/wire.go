@@ -73,7 +73,7 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 type wireRunResult struct{}
 
 func wireRun(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 	_ server.Server,

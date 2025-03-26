@@ -30,10 +30,6 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	v, err := types.ProvideComponents()
-	if err != nil {
-		return wireRunResult{}, err
-	}
 	appConfigData, err := cli.ProvideAppConfigData(appContext)
 	if err != nil {
 		return wireRunResult{}, err
@@ -42,23 +38,27 @@ func run(appContext *cli.AppContext, args []string, cb wireRunCallback) (wireRun
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	v2, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
+	v, err := cli.ProvideParsedFlagsFromArgs(appContext, parserFunc, args)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v2)
+	serviceContextWithConfig, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, v)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	logger, err := log.ProvideWithServiceNameField(serviceContextHasConfigData, serviceContext, v)
+	v2, err := types.ProvideComponents()
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	eventType, err := event.ProvideNoOpts(serviceContext, v, logger)
+	logger, err := log.ProvideWithServiceNameField(serviceContextWithConfig, v2)
 	if err != nil {
 		return wireRunResult{}, err
 	}
-	mainWireRunResult, err := wireRun(serviceContext, v, logger, eventType, cb)
+	eventType, err := event.ProvideNoOpts(serviceContextWithConfig, v2, logger)
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	mainWireRunResult, err := wireRun(serviceContextWithConfig, v2, logger, eventType, cb)
 	if err != nil {
 		return wireRunResult{}, err
 	}
@@ -78,7 +78,7 @@ type wireRunCallback func(
 ) error
 
 func wireRun(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 	eventHandler event.Type,

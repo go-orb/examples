@@ -27,7 +27,7 @@ func flags() []*cli.Flag {
 	flags = append(flags, cli.NewFlag(
 		"connections",
 		defaultConnections,
-		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "connections"}}),
+		cli.FlagConfigPaths([]string{configSection, "connections"}),
 		cli.FlagUsage("Connections to keep open"),
 		cli.FlagEnvVars("CONNECTIONS"),
 	))
@@ -35,7 +35,7 @@ func flags() []*cli.Flag {
 	flags = append(flags, cli.NewFlag(
 		"duration",
 		defaultDuration,
-		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "duration"}}),
+		cli.FlagConfigPaths([]string{configSection, "duration"}),
 		cli.FlagUsage("Duration in seconds"),
 		cli.FlagEnvVars("DURATION"),
 	))
@@ -43,7 +43,7 @@ func flags() []*cli.Flag {
 	flags = append(flags, cli.NewFlag(
 		"timeout",
 		defaultTimeout,
-		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "timeout"}}),
+		cli.FlagConfigPaths([]string{configSection, "timeout"}),
 		cli.FlagUsage("Timeout in seconds"),
 		cli.FlagEnvVars("TIMEOUT"),
 	))
@@ -51,7 +51,7 @@ func flags() []*cli.Flag {
 	flags = append(flags, cli.NewFlag(
 		"threads",
 		defaultThreads,
-		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "threads"}}),
+		cli.FlagConfigPaths([]string{configSection, "threads"}),
 		cli.FlagUsage("Number of threads to use = runtime.GOMAXPROCS()"),
 		cli.FlagEnvVars("THREADS"),
 	))
@@ -59,7 +59,7 @@ func flags() []*cli.Flag {
 	flags = append(flags, cli.NewFlag(
 		"package_size",
 		defaultPackageSize,
-		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "packageSize"}}),
+		cli.FlagConfigPaths([]string{configSection, "packageSize"}),
 		cli.FlagUsage("Per request package size"),
 		cli.FlagEnvVars("PACKAGE_SIZE"),
 	))
@@ -67,7 +67,7 @@ func flags() []*cli.Flag {
 	flags = append(flags, cli.NewFlag(
 		"content_type",
 		defaultContentType,
-		cli.FlagConfigPaths(cli.FlagConfigPath{Path: []string{configSection, "contentType"}}),
+		cli.FlagConfigPaths([]string{configSection, "contentType"}),
 		cli.FlagUsage("Content-Type (application/x-protobuf, application/x-protobuf+json)"),
 		cli.FlagEnvVars("CONTENT_TYPE"),
 	))

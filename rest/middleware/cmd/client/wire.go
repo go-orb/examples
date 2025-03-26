@@ -25,7 +25,7 @@ type wireRunCallback func(
 ) error
 
 func wireRun(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 	clientWire client.Type,

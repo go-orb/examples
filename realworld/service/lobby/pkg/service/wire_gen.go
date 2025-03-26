@@ -27,27 +27,27 @@ func ProvideRunner(appContext *cli.AppContext, appConfigData cli.AppConfigData, 
 	if err != nil {
 		return nil, err
 	}
+	serviceContextWithConfig, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, flags)
+	if err != nil {
+		return nil, err
+	}
 	v, err := types.ProvideComponents()
 	if err != nil {
 		return nil, err
 	}
-	serviceContextHasConfigData, err := cli.ProvideServiceConfigData(serviceContext, appConfigData, flags)
+	logger, err := log.ProvideWithServiceNameField(serviceContextWithConfig, v)
 	if err != nil {
 		return nil, err
 	}
-	logger, err := log.ProvideWithServiceNameField(serviceContextHasConfigData, serviceContext, v)
+	registryType, err := registry.ProvideNoOpts(serviceContextWithConfig, v, logger)
 	if err != nil {
 		return nil, err
 	}
-	registryType, err := registry.ProvideNoOpts(serviceContext, v, logger)
+	serverServer, err := server.ProvideNoOpts(serviceContextWithConfig, v, logger, registryType)
 	if err != nil {
 		return nil, err
 	}
-	serverServer, err := server.ProvideNoOpts(serviceContext, v, logger, registryType)
-	if err != nil {
-		return nil, err
-	}
-	clientType, err := client.ProvideNoOpts(serviceContext, v, logger, registryType)
+	clientType, err := client.ProvideNoOpts(serviceContextWithConfig, v, logger, registryType)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func ProvideRunner(appContext *cli.AppContext, appConfigData cli.AppConfigData, 
 	if err != nil {
 		return nil, err
 	}
-	actionServer, err := provideActionServer(serviceContext, v, logger, serverServer, handlerHandler)
+	actionServer, err := provideActionServer(serviceContextWithConfig, v, logger, serverServer, handlerHandler)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func provideServiceContext(appContext *cli.AppContext) (*cli.ServiceContext, err
 }
 
 func provideActionServer(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 	_ server.Server, handler2 *handler.Handler,

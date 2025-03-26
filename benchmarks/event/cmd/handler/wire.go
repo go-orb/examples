@@ -20,7 +20,7 @@ import (
 type wireRunResult struct{}
 
 func wireRun(
-	serviceContext *cli.ServiceContext,
+	serviceContext *cli.ServiceContextWithConfig,
 	components *types.Components,
 	logger log.Logger,
 	eventHandler event.Type,

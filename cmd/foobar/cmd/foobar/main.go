@@ -31,7 +31,7 @@ func main() {
 				Name:        "log_level",
 				Default:     "INFO",
 				EnvVars:     []string{"LOG_LEVEL"},
-				ConfigPaths: []cli.FlagConfigPath{{Path: []string{"logger", "level"}}},
+				ConfigPaths: [][]string{{"logger", "level"}},
 				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
 			},
 		},
