@@ -3,13 +3,13 @@ module github.com/go-orb/examples/benchmarks/event
 go 1.23.6
 
 require (
-	github.com/go-orb/go-orb v0.2.2-0.20250324124045-3bdc9fe02ce0
-	github.com/go-orb/plugins/cli/urfave v0.0.0-20250324190622-29a1b5614fc6
-	github.com/go-orb/plugins/codecs/goccyjson v0.1.1-0.20250324190622-29a1b5614fc6
-	github.com/go-orb/plugins/codecs/json v0.1.1-0.20250324190622-29a1b5614fc6
-	github.com/go-orb/plugins/codecs/proto v0.1.1-0.20250324190622-29a1b5614fc6
-	github.com/go-orb/plugins/event/natsjs v0.1.1-0.20250324190622-29a1b5614fc6
-	github.com/go-orb/plugins/log/slog v0.1.1-0.20250324190622-29a1b5614fc6
+	github.com/go-orb/go-orb v0.3.0
+	github.com/go-orb/plugins/cli/urfave v0.1.0
+	github.com/go-orb/plugins/codecs/goccyjson v0.2.0
+	github.com/go-orb/plugins/codecs/json v0.2.0
+	github.com/go-orb/plugins/codecs/proto v0.2.0
+	github.com/go-orb/plugins/event/natsjs v0.2.0
+	github.com/go-orb/plugins/log/slog v0.2.0
 	github.com/go-orb/wire v0.7.0
 	google.golang.org/protobuf v1.36.6
 )
@@ -24,7 +24,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
-	github.com/nats-io/nats.go v1.40.0 // indirect
+	github.com/nats-io/nats.go v1.40.1 // indirect
 	github.com/nats-io/nkeys v0.4.10 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
