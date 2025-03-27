@@ -9,14 +9,13 @@ import (
 const (
 	configSection = "benchClient"
 
-	defaultBypassRegistry = 1
-	defaultConnections    = 256
-	defaultPoolSize       = 256
-	defaultDuration       = 15
-	defaultTimeout        = 15
-	defaultTransport      = "grpc"
-	defaultPackageSize    = 1000
-	defaultContentType    = "application/x-protobuf"
+	defaultConnections = 256
+	defaultPoolSize    = 256
+	defaultDuration    = 15
+	defaultTimeout     = 15
+	defaultTransport   = "grpc"
+	defaultPackageSize = 1000
+	defaultContentType = "application/x-protobuf"
 )
 
 //nolint:gochecknoglobals
@@ -26,14 +25,6 @@ var (
 
 func flags() []*cli.Flag {
 	var flags []*cli.Flag
-
-	flags = append(flags, cli.NewFlag(
-		"bypass_registry",
-		defaultBypassRegistry,
-		cli.FlagConfigPaths([]string{configSection, "bypassRegistry"}),
-		cli.FlagUsage("Bypasses the registry by caching it, set to 0 to disable"),
-		cli.FlagEnvVars("BYPASS_REGISTRY"),
-	))
 
 	flags = append(flags, cli.NewFlag(
 		"pool_size",
@@ -103,13 +94,12 @@ func flags() []*cli.Flag {
 }
 
 type clientConfig struct {
-	BypassRegistry int    `json:"bypassRegistry" yaml:"bypassRegistry"`
-	PoolSize       int    `json:"poolSize"       yaml:"poolSize"`
-	Connections    int    `json:"connections"    yaml:"connections"`
-	Duration       int    `json:"duration"       yaml:"duration"`
-	Timeout        int    `json:"timeout"        yaml:"timeout"`
-	Threads        int    `json:"threads"        yaml:"threads"`
-	Transport      string `json:"transport"      yaml:"transport"`
-	PackageSize    int    `json:"packageSize"    yaml:"packageSize"`
-	ContentType    string `json:"contentType"    yaml:"contentType"`
+	PoolSize    int    `json:"poolSize"       yaml:"poolSize"`
+	Connections int    `json:"connections"    yaml:"connections"`
+	Duration    int    `json:"duration"       yaml:"duration"`
+	Timeout     int    `json:"timeout"        yaml:"timeout"`
+	Threads     int    `json:"threads"        yaml:"threads"`
+	Transport   string `json:"transport"      yaml:"transport"`
+	PackageSize int    `json:"packageSize"    yaml:"packageSize"`
+	ContentType string `json:"contentType"    yaml:"contentType"`
 }

@@ -101,21 +101,6 @@ func setupClientOptions(ctx context.Context, cfg *clientConfig, cli client.Type,
 		client.WithContentType(cfg.ContentType),
 	}
 
-	// Handle direct connection (bypass registry)
-	if cfg.BypassRegistry == 1 {
-		logger.Debug("Resolving service", "server", serverName)
-
-		// Resolve service nodes
-		address, _, err := cli.SelectService(ctx, serverName, client.WithPreferredTransports(cfg.Transport))
-		if err != nil {
-			return nil, fmt.Errorf("failed to resolve service: %w", err)
-		}
-
-		// Add direct URL to options
-		opts = append(opts, client.WithURL(fmt.Sprintf("%s://%s", cfg.Transport, address)))
-		logger.Info("Using transport", "transport", cfg.Transport)
-	}
-
 	return opts, nil
 }
 
@@ -157,7 +142,6 @@ func runBenchmark(
 func bench(ctx context.Context, cfg *clientConfig, logger log.Logger, cli client.Type) error {
 	// Log configuration
 	logger.Info("Configuration",
-		"bypass_registry", cfg.BypassRegistry,
 		"connections", cfg.Connections,
 		"duration", cfg.Duration,
 		"timeout", cfg.Timeout,

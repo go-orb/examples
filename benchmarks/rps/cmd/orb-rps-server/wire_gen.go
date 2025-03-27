@@ -100,6 +100,9 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 	opts = append(opts, server.WithEntrypointConfig("http2", http.NewConfig(http.WithHandlers(hRegister))))
 	opts = append(opts, server.WithEntrypointConfig("http3", http.NewConfig(http.WithHTTP3(), http.WithHandlers(hRegister))))
 	opts = append(opts, server.WithEntrypointConfig("drpc", drpc.NewConfig(drpc.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("unix+drpc", drpc.NewConfig(drpc.WithNetwork("unix"), drpc.WithAddress("/tmp/orb-rps-server-drpc.sock"), drpc.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("unix+grpc", grpc.NewConfig(grpc.WithNetwork("unix"), grpc.WithAddress("/tmp/orb-rps-server-grpc.sock"), grpc.WithHandlers(hRegister))))
+	opts = append(opts, server.WithEntrypointConfig("unix+http", http.NewConfig(http.WithNetwork("unix"), http.WithAddress("/tmp/orb-rps-server-http.sock"), http.WithHandlers(hRegister))))
 
 	return opts, nil
 }

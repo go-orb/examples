@@ -65,6 +65,21 @@ func provideServerOpts() ([]server.ConfigOption, error) {
 	opts = append(opts, server.WithEntrypointConfig("drpc", drpc.NewConfig(
 		drpc.WithHandlers(hRegister),
 	)))
+	opts = append(opts, server.WithEntrypointConfig("unix+drpc", drpc.NewConfig(
+		drpc.WithNetwork("unix"),
+		drpc.WithAddress("/tmp/orb-rps-server-drpc.sock"),
+		drpc.WithHandlers(hRegister),
+	)))
+	opts = append(opts, server.WithEntrypointConfig("unix+grpc", mgrpc.NewConfig(
+		mgrpc.WithNetwork("unix"),
+		mgrpc.WithAddress("/tmp/orb-rps-server-grpc.sock"),
+		mgrpc.WithHandlers(hRegister),
+	)))
+	opts = append(opts, server.WithEntrypointConfig("unix+http", mhttp.NewConfig(
+		mhttp.WithNetwork("unix"),
+		mhttp.WithAddress("/tmp/orb-rps-server-http.sock"),
+		mhttp.WithHandlers(hRegister),
+	)))
 
 	return opts, nil
 }

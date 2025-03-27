@@ -137,15 +137,14 @@ func wireRun(
 
 func provideClientConfig(svcCtx *cli.ServiceContextWithConfig) (*clientConfig, error) {
 	cfg := &clientConfig{
-		BypassRegistry: defaultBypassRegistry,
-		PoolSize:       defaultPoolSize,
-		Connections:    defaultConnections,
-		Duration:       defaultDuration,
-		Timeout:        defaultTimeout,
-		Threads:        defaultThreads,
-		Transport:      defaultTransport,
-		PackageSize:    defaultPackageSize,
-		ContentType:    defaultContentType,
+		PoolSize:    defaultPoolSize,
+		Connections: defaultConnections,
+		Duration:    defaultDuration,
+		Timeout:     defaultTimeout,
+		Threads:     defaultThreads,
+		Transport:   defaultTransport,
+		PackageSize: defaultPackageSize,
+		ContentType: defaultContentType,
 	}
 
 	if err := config.Parse(nil, configSection, svcCtx.Config(), &cfg); err != nil && !errors.Is(err, config.ErrNoSuchKey) {
