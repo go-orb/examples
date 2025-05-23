@@ -1,0 +1,13 @@
+request:
+  logger:
+    level: TRACE
+  event:
+    servers:
+      - nats://tmp:4222
+
+handler:
+  logger:
+    level: TRACE
+  event:
+    servers:
+      - nats://tmp:4222

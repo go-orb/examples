@@ -9,6 +9,8 @@ import (
 
 	"github.com/go-orb/examples/event/simple/pb/user_new"
 	"github.com/go-orb/go-orb/cli"
+	"github.com/go-orb/go-orb/codecs"
+	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
@@ -36,6 +38,13 @@ func wireRun(
 			return wireRunResult{}, fmt.Errorf("failed to start component %s/%s: %w", c.Type(), c.String(), err)
 		}
 	}
+
+	b, err := config.Dump(codecs.MimeYAML, serviceContext.Config())
+	if err != nil {
+		return wireRunResult{}, err
+	}
+
+	fmt.Println(string(b))
 
 	//
 	// Actual code

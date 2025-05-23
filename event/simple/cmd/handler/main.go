@@ -8,13 +8,15 @@ import (
 	"github.com/go-orb/go-orb/cli"
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
+	_ "github.com/go-orb/plugins/codecs/yaml"
+	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
 )
 
 func main() {
 	app := cli.App{
-		Name:     "orb.examples.event.simple.handler",
+		Name:     "handler",
 		Version:  "",
 		Usage:    "A foobar example app",
 		NoAction: false,
@@ -27,6 +29,7 @@ func main() {
 				Usage:       "Set the log level, one of TRACE, DEBUG, INFO, WARN, ERROR",
 			},
 		},
+
 		Commands: []*cli.Command{},
 	}
 

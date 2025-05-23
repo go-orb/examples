@@ -10,8 +10,11 @@ import (
 	"github.com/go-orb/go-orb/cli"
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
+
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
+	_ "github.com/go-orb/plugins/codecs/yaml"
+	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
 )
@@ -36,7 +39,7 @@ func runner(
 
 func main() {
 	app := cli.App{
-		Name:     "orb.examples.event.simple.request",
+		Name:     "request",
 		Version:  "",
 		Usage:    "A foobar example app",
 		NoAction: false,

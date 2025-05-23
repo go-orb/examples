@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"github.com/go-orb/examples/event/simple/pb/user_new"
 	"github.com/go-orb/go-orb/cli"
+	"github.com/go-orb/go-orb/codecs"
+	"github.com/go-orb/go-orb/config"
 	"github.com/go-orb/go-orb/event"
 	"github.com/go-orb/go-orb/log"
 	"github.com/go-orb/go-orb/types"
@@ -21,6 +23,8 @@ import (
 import (
 	_ "github.com/go-orb/plugins/codecs/json"
 	_ "github.com/go-orb/plugins/codecs/proto"
+	_ "github.com/go-orb/plugins/codecs/yaml"
+	_ "github.com/go-orb/plugins/config/source/file"
 	_ "github.com/go-orb/plugins/event/natsjs"
 	_ "github.com/go-orb/plugins/log/slog"
 )
@@ -88,6 +92,12 @@ func wireRun(
 			return wireRunResult{}, fmt.Errorf("failed to start component %s/%s: %w", c.Type(), c.String(), err)
 		}
 	}
+
+	b, err := config.Dump(codecs.MimeYAML, serviceContext.Config())
+	if err != nil {
+		return wireRunResult{}, err
+	}
+	fmt.Println(string(b))
 
 	userNewHandler := func(_ context.Context, req *user_new.Request) (*user_new.Resp, error) {
 		return &user_new.Resp{Name: req.GetName(), Uuid: shortuuid.New()}, nil
